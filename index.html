@@ -3381,25 +3381,22 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycbx5TUxYIiQMFRkH8KWfOZbGQd
 
 // Función universal que reemplaza google.script.run
 function gasCall(functionName, args, successHandler, failureHandler) {
-  var payload = { action: functionName, args: args || [] };
-  var formData = new FormData();
-  formData.append('payload', JSON.stringify(payload));
+  var payload = JSON.stringify({ action: functionName, args: args || [] });
+  // Enviar como URL-encoded — formato que GAS lee mejor desde exterior
   fetch(GAS_URL, {
     method: 'POST',
-    body: formData,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'payload=' + encodeURIComponent(payload),
     redirect: 'follow'
   })
-  .then(function(r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.text();
-  })
+  .then(function(r) { return r.text(); })
   .then(function(text) {
     try {
       var data = JSON.parse(text);
       if (successHandler) successHandler(data);
     } catch(e) {
-      console.error('Respuesta no es JSON:', text);
-      if (failureHandler) failureHandler(new Error('Respuesta inválida del servidor'));
+      console.error('Respuesta no es JSON:', text.substring(0, 200));
+      if (failureHandler) failureHandler(new Error('Respuesta inválida'));
     }
   })
   .catch(function(err) {
