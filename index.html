@@ -3382,11 +3382,21 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycbzn9waQgzlAhI8iCfHVa7CcDB
 // Función universal que reemplaza google.script.run
 function gasCall(functionName, args, successHandler, failureHandler) {
   var payload = JSON.stringify({ action: functionName, args: args || [] });
-  // Usar GET con query param — más confiable con GAS desde dominios externos
   var url = GAS_URL + '?payload=' + encodeURIComponent(payload);
-  fetch(url, { method: 'GET', redirect: 'follow' })
+  fetch(url, {
+    method: 'GET',
+    redirect: 'follow',
+    mode: 'cors'
+  })
   .then(function(r) { return r.text(); })
   .then(function(text) {
+    // GAS a veces devuelve HTML cuando hay error de CORS
+    if (text.trim().startsWith('<')) {
+      console.error('GAS devolvió HTML en lugar de JSON — posible error CORS');
+      // Intentar con no-cors como fallback usando un iframe oculto
+      _gasCallFallback(functionName, args, successHandler, failureHandler);
+      return;
+    }
     try {
       var data = JSON.parse(text);
       if (successHandler) successHandler(data);
@@ -3397,9 +3407,32 @@ function gasCall(functionName, args, successHandler, failureHandler) {
   })
   .catch(function(err) {
     console.error('Error llamando ' + functionName + ':', err);
-    if (failureHandler) failureHandler(err);
-    else showToast('Error de conexión con el servidor', 'error');
+    // Intentar fallback
+    _gasCallFallback(functionName, args, successHandler, failureHandler);
   });
+}
+
+// Fallback usando JSONP-style con script tag para evitar CORS
+function _gasCallFallback(functionName, args, successHandler, failureHandler) {
+  var callbackName = '_cb_' + Date.now();
+  var payload = JSON.stringify({ action: functionName, args: args || [] });
+  var url = GAS_URL + '?payload=' + encodeURIComponent(payload) + '&callback=' + callbackName;
+  
+  window[callbackName] = function(data) {
+    delete window[callbackName];
+    document.head.removeChild(script);
+    if (successHandler) successHandler(data);
+  };
+  
+  var script = document.createElement('script');
+  script.src = url;
+  script.onerror = function() {
+    delete window[callbackName];
+    document.head.removeChild(script);
+    if (failureHandler) failureHandler(new Error('Error de conexión'));
+    else showToast('Error de conexión con el servidor', 'error');
+  };
+  document.head.appendChild(script);
 }
 
 // Registrar Service Worker para PWA
