@@ -3,7 +3,14 @@
 <head>
 <base target="_top">
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CentroAqA">
+<meta name="theme-color" content="#5a7a94">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Centro Psicológico Aquí y Ahora A.C. - Sistema de Gestión</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1250,102 +1257,63 @@ margin-top: 40px;
 .quick-actions { grid-template-columns: repeat(2, 1fr); }
 .patient-info-grid { grid-template-columns: 1fr; }
 .fin-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.layout { grid-template-columns: 200px 1fr; }
 .espacios-grid { grid-template-columns: repeat(3, 1fr); }
 .week-view { grid-template-columns: 50px repeat(7, 1fr); }
 .week-view .day-header { font-size: 10px; padding: 6px; }
 .data-table { font-size: 13px; }
 .data-table th, .data-table td { padding: 8px 10px; }
-.fin-card-value { font-size: 22px; }
 .tabs-container { flex-wrap: wrap; gap: 4px; }
 .tab-btn { font-size: 12px; padding: 6px 12px; }
 .reporte-controles { flex-wrap: wrap; gap: 10px; }
 }
 
-/* ===== MÓVIL (768px) ===== */
+/* ===== SIDEBAR COLAPSABLE (controlado por JS, no por media query) ===== */
+/* Sidebar siempre visible en el grid — el botón ☰ lo colapsa/expande */
+.layout.sidebar-collapsed { grid-template-columns: 48px 1fr; }
+.layout.sidebar-collapsed .sidebar { padding: 16px 8px; overflow: hidden; }
+.layout.sidebar-collapsed .nav-section-title { display: none; }
+.layout.sidebar-collapsed .nav-btn span:last-child { display: none; }
+.layout.sidebar-collapsed .nav-btn { justify-content: center; padding: 10px 0; }
+.layout.sidebar-collapsed .nav-btn .nav-icon { margin: 0; font-size: 18px; }
+
+/* Overlay (solo se usa si se quiere drawer en pantallas muy pequeñas) */
+.sidebar-overlay { display: none; }
+
+/* MÓVIL REAL: solo ajustes de contenido, sidebar sigue en el grid */
 @media (max-width: 768px) {
-/* Layout: una sola columna, sidebar sale del flujo */
-.layout { grid-template-columns: 1fr; }
-.main-content { padding: 12px; overflow-y: auto; }
-
-/* Sidebar como drawer deslizable */
-.sidebar {
-position: fixed !important;
-top: 0 !important;
-left: 0 !important;
-width: 280px !important;
-height: 100vh !important;
-z-index: 200 !important;
-transform: translateX(-100%);
-transition: transform 0.25s ease;
-box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-display: flex !important;
-}
-.sidebar.mobile-open { transform: translateX(0); }
-
-/* Overlay oscuro detrás del sidebar */
-.sidebar-overlay {
-display: none;
-position: fixed;
-inset: 0;
-background: rgba(0,0,0,0.45);
-z-index: 199;
-}
-.sidebar-overlay.show { display: block; }
-
-/* Header */
-.mobile-menu-btn { display: block; }
-.header-right .user-info span:last-child { display: none; }
-.header { padding: 0 12px; }
-.header-brand h1 { font-size: 13px; }
-.header-brand p { display: none; }
-
-/* Grids */
+.main-content { padding: 12px; }
 .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .quick-actions { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .fin-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .form-grid { grid-template-columns: 1fr; }
 .form-grid.cols-3 { grid-template-columns: 1fr; }
 .espacios-grid { grid-template-columns: repeat(2, 1fr); }
-
-/* Tablas: scroll horizontal */
 .card-body-no-padding { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.data-table { min-width: 520px; font-size: 12px; }
-.data-table th, .data-table td { padding: 7px 8px; white-space: nowrap; }
+.data-table { min-width: 420px; font-size: 12px; }
+.data-table th, .data-table td { padding: 6px 8px; white-space: nowrap; }
 .table-btn { padding: 3px 8px; font-size: 11px; }
-
-/* Formularios */
 .form-actions { flex-direction: column; gap: 8px; }
 .form-actions .btn { width: 100%; justify-content: center; }
 .reporte-controles { flex-direction: column; gap: 10px; }
 .reporte-controles .form-group { width: 100%; }
 .reporte-controles .btn { width: 100%; }
-
-/* Cards */
-.card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-
-/* Agenda */
 .week-view { display: none; }
 .month-view { grid-template-columns: repeat(3, 1fr); }
-
-/* Reportes */
 .tabla-reporte-wrap { overflow-x: auto; }
-.hora-label { font-size: 11px; width: 44px; }
-
-/* Wizard */
 .wizard-header { flex-direction: column; gap: 4px; }
 .wizard-step { border-bottom: none; border-left: 3px solid transparent; padding: 8px 12px; }
 .wizard-step.active { border-left-color: var(--accent); }
-
-/* Tabs */
 .tabs-container { flex-wrap: wrap; gap: 4px; }
 .tab-btn { font-size: 11px; padding: 6px 10px; flex: 1 1 auto; text-align: center; }
-
-/* Toast */
 .toast { min-width: unset; width: calc(100vw - 32px); right: 16px; bottom: 16px; }
+/* Sidebar colapsado por defecto en móvil */
+.layout { grid-template-columns: 48px 1fr; }
+.sidebar { padding: 16px 8px; overflow: hidden; }
+.nav-section-title { display: none; }
+.nav-btn span:last-child { display: none; }
+.nav-btn { justify-content: center; padding: 10px 0; }
 }
 
-/* ===== MÓVIL PEQUEÑO (480px) ===== */
 @media (max-width: 480px) {
 .metrics-grid { grid-template-columns: 1fr; }
 .quick-actions { grid-template-columns: 1fr; }
@@ -1353,7 +1321,70 @@ z-index: 199;
 .metric-card .value { font-size: 20px; }
 .login-box { padding: 24px 16px; }
 .page-header h2 { font-size: 20px; }
-.btn { font-size: 13px; padding: 8px 14px; }
+}
+
+/* ===== MÓVIL: sidebar colapsado automático + touch ===== */
+@media (max-width: 640px) {
+/* Sidebar siempre colapsado en móvil (solo iconos) */
+.layout { grid-template-columns: 48px 1fr !important; }
+.sidebar {
+padding: 12px 6px !important;
+overflow: hidden !important;
+}
+.nav-section-title { display: none !important; }
+.nav-btn { 
+justify-content: center !important; 
+padding: 12px 4px !important;
+font-size: 20px !important;
+border-radius: 8px;
+}
+.nav-btn span:last-child { display: none !important; }
+.nav-btn .nav-icon { margin: 0 !important; font-size: 22px !important; }
+/* Agrandar áreas táctiles */
+.btn { min-height: 44px; }
+.table-btn { min-height: 36px; padding: 6px 10px !important; font-size: 12px !important; }
+input, select, textarea { font-size: 16px !important; min-height: 44px; }
+/* Evitar zoom en inputs (iOS) */
+select { font-size: 16px !important; }
+/* Contenido principal ocupa todo */
+.main-content { padding: 10px 8px !important; }
+.card { margin-bottom: 12px; }
+.card-body { padding: 12px !important; }
+/* Header compacto */
+.header { height: 52px; padding: 0 8px; }
+.header-brand h1 { font-size: 12px !important; }
+.header-brand p { display: none !important; }
+.header-right .user-info { display: none; }
+/* Tabs scrolleables horizontalmente */
+.tabs-container { 
+flex-wrap: nowrap !important; 
+overflow-x: auto; 
+-webkit-overflow-scrolling: touch;
+padding-bottom: 4px;
+gap: 4px;
+}
+.tab-btn { 
+white-space: nowrap;
+flex-shrink: 0;
+font-size: 11px !important;
+padding: 6px 10px !important;
+}
+/* Formularios */
+.form-grid { grid-template-columns: 1fr !important; gap: 10px; }
+.form-group label { font-size: 12px; }
+.page-header { margin-bottom: 12px; }
+.page-header h2 { font-size: 18px; }
+.page-header p { font-size: 12px; }
+/* Botones de acción del header de vistas */
+.page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+/* Métricas del dashboard */
+.metric-card { padding: 12px; }
+.metric-card .value { font-size: 22px; }
+.metric-card .label { font-size: 11px; }
+/* Alertas */
+#alertas-list { max-height: 150px; }
+/* Tabla reporte scroll */
+.tabla-reporte-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 /* ===== POPUP RIESGO SUICIDA ===== */
 .riesgo-popup-overlay {
@@ -1480,50 +1511,77 @@ display: block;
 <div class="layout">
 <!-- Overlay para cerrar sidebar en móvil -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
+<!-- Menú flotante móvil -->
+<div id="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+<nav id="mobile-menu-panel">
+<button id="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+<div style="margin-top:8px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; margin-bottom:8px;">
+<div style="font-size:13px; font-weight:700; color:#4a6a84;">Centro Psicológico</div>
+<div style="font-size:11px; color:#94a3b8;" id="mobile-user-name"></div>
+</div>
+<div class="nav-section-title">Principal</div>
+<button class="nav-btn active" onclick="goToView('dashboard');closeMobileMenu()"><span class="icon">📊</span> Dashboard</button>
+<button class="nav-btn" onclick="goToView('agenda');closeMobileMenu()"><span class="icon">📅</span> Agenda</button>
+<div class="nav-section-title">Pacientes</div>
+<button class="nav-btn" onclick="goToView('alta');closeMobileMenu()"><span class="icon">➕</span> Alta Paciente</button>
+<button class="nav-btn" onclick="goToView('buscar');closeMobileMenu()"><span class="icon">🔍</span> Buscar Paciente</button>
+<button class="nav-btn" onclick="goToView('historial');closeMobileMenu()"><span class="icon">📋</span> Historial</button>
+<div class="nav-section-title">Gestión</div>
+<button class="nav-btn" onclick="goToView('estatus');closeMobileMenu()"><span class="icon">⚙️</span> Cambiar Estatus</button>
+<button class="nav-btn" onclick="goToView('espacios');closeMobileMenu()"><span class="icon">🕐</span> Espacios Libres</button>
+<div class="nav-section-title">Análisis</div>
+<button class="nav-btn" onclick="goToView('reportes');closeMobileMenu()"><span class="icon">📈</span> Reportes</button>
+<button class="nav-btn" onclick="goToView('finanzas');closeMobileMenu()"><span class="icon">💰</span> Finanzas</button>
+<div class="nav-section-title">Clínico</div>
+<button class="nav-btn" onclick="goToView('historial-clinico');closeMobileMenu()"><span class="icon">🏥</span> Historial Clínico</button>
+<div style="margin-top:24px; padding-top:16px; border-top:1px solid #e2e8f0;">
+<button onclick="handleLogout();closeMobileMenu()" style="width:100%;padding:10px;background:#fee2e2;color:#ef4444;border:none;border-radius:8px;font-size:14px;cursor:pointer;">🚪 Cerrar Sesión</button>
+</div>
+</nav>
 <!-- Sidebar -->
 <nav class="sidebar" id="sidebar">
 <div class="nav-section">
 <div class="nav-section-title">Principal</div>
-<button class="nav-btn active" data-view="dashboard" onclick="goToView('dashboard')">
+<button class="nav-btn active" data-view="dashboard" title="Dashboard" onclick="goToView('dashboard')">
 <span class="icon">📊</span> Dashboard
 </button>
-<button class="nav-btn" data-view="agenda" onclick="goToView('agenda')">
+<button class="nav-btn" data-view="agenda" title="Agenda" onclick="goToView('agenda')">
 <span class="icon">📅</span> Agenda
 </button>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">Pacientes</div>
-<button class="nav-btn" data-view="alta" onclick="goToView('alta')">
+<button class="nav-btn" data-view="alta" title="Alta Paciente" onclick="goToView('alta')">
 <span class="icon">➕</span> Alta Paciente
 </button>
-<button class="nav-btn" data-view="buscar" onclick="goToView('buscar')">
+<button class="nav-btn" data-view="buscar" title="Buscar Paciente" onclick="goToView('buscar')">
 <span class="icon">🔍</span> Buscar Paciente
 </button>
-<button class="nav-btn" id="btnHistorialPaciente" data-view="historial" onclick="goToView('historial')">
+<button class="nav-btn" id="btnHistorialPaciente" data-view="historial" title="Historial" onclick="goToView('historial')">
 <span class="icon">📋</span> Historial
 </button>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">Gestión</div>
-<button class="nav-btn" data-view="estatus" onclick="goToView('estatus')">
+<button class="nav-btn" data-view="estatus" title="Cambiar Estatus" onclick="goToView('estatus')">
 <span class="icon">⚙️</span> Cambiar Estatus
 </button>
-<button class="nav-btn" data-view="espacios" onclick="goToView('espacios')">
+<button class="nav-btn" data-view="espacios" title="Espacios Libres" onclick="goToView('espacios')">
 <span class="icon">🕐</span> Espacios Libres
 </button>
 </div>
 <div class="nav-section" id="menuAnalisis">
 <div class="nav-section-title">Análisis</div>
-<button class="nav-btn" data-view="reportes" onclick="goToView('reportes')">
+<button class="nav-btn" data-view="reportes" title="Reportes" onclick="goToView('reportes')">
 <span class="icon">📈</span> Reportes
 </button>
-<button class="nav-btn" data-view="finanzas" onclick="goToView('finanzas')">
+<button class="nav-btn" data-view="finanzas" title="Finanzas" onclick="goToView('finanzas')">
 <span class="icon">💰</span> Finanzas
 </button>
 </div>
 <div class="nav-section" id="menuHistorialClinico">
 <div class="nav-section-title">Clínico</div>
-<button class="nav-btn" data-view="historial-clinico" onclick="goToView('historial-clinico')">
+<button class="nav-btn" data-view="historial-clinico" title="Historial Clínico" onclick="goToView('historial-clinico')">
 <span class="icon">🏥</span> Historial Clínico
 </button>
 </div>
@@ -3315,6 +3373,53 @@ var currentUser = null;
 var currentToken = null;
 
 // ============================================================
+// == CONFIGURACIÓN PWA — URL DEL BACKEND (Google Apps Script)
+// ============================================================
+// IMPORTANTE: Pega aquí la URL de tu Web App de GAS
+// La encuentras en: Apps Script → Implementar → Administrar implementaciones
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbx5TUxYIiQMFRkH8KWfOZbGQdpSBYBPe0FYMtGf30MgWBwCHs_pud0miHIZTrtPwlZg/exec';
+
+// Función universal que reemplaza google.script.run
+function gasCall(functionName, args, successHandler, failureHandler) {
+  var payload = { action: functionName, args: args || [] };
+  var formData = new FormData();
+  formData.append('payload', JSON.stringify(payload));
+  fetch(GAS_URL, {
+    method: 'POST',
+    body: formData,
+    redirect: 'follow'
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.text();
+  })
+  .then(function(text) {
+    try {
+      var data = JSON.parse(text);
+      if (successHandler) successHandler(data);
+    } catch(e) {
+      console.error('Respuesta no es JSON:', text);
+      if (failureHandler) failureHandler(new Error('Respuesta inválida del servidor'));
+    }
+  })
+  .catch(function(err) {
+    console.error('Error llamando ' + functionName + ':', err);
+    if (failureHandler) failureHandler(err);
+    else showToast('Error de conexión con el servidor', 'error');
+  });
+}
+
+// Registrar Service Worker para PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(function(reg) { console.log('SW registrado:', reg.scope); })
+      .catch(function(err) { console.log('SW error:', err); });
+  });
+}
+
+
+// ============================================================
 // ==================== SEGURIDAD: XSS =======================
 // ============================================================
 // sanitize() escapa caracteres HTML peligrosos en cualquier
@@ -3349,6 +3454,59 @@ var isPacienteMenor = false;
 // ==================== INICIALIZACIÓN ========================
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+
+// ── DETECCIÓN MÓVIL POR JS ──
+(function detectarMovil() {
+  var esTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  var ancho   = window.innerWidth || document.documentElement.clientWidth;
+  window._esMovil = esTouch || ancho < 900;
+
+  if (window._esMovil) {
+    var style = document.createElement('style');
+    style.id  = 'mobile-overrides';
+    style.textContent = [
+      // Ocultar sidebar completamente — se reemplaza por menú flotante
+      '.layout { grid-template-columns: 1fr !important; }',
+      '.sidebar { display: none !important; }',
+      '.sidebar-overlay { display: none !important; }',
+      // Mostrar botón hamburguesa
+      '.mobile-menu-btn { display: flex !important; }',
+      // Contenido ocupa todo
+      '.main-content { padding: 10px 8px !important; width: 100% !important; }',
+      // Inputs sin zoom iOS
+      'input, select, textarea { font-size: 16px !important; }',
+      // Tabs deslizables
+      '.tabs-container { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 4px; }',
+      '.tab-btn { white-space: nowrap !important; flex-shrink: 0 !important; }',
+      // Tablas scroll
+      '.card-body-no-padding { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }',
+      '.tabla-reporte-wrap { overflow-x: auto !important; }',
+      // Grids
+      '.form-grid { grid-template-columns: 1fr !important; }',
+      '.metrics-grid { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }',
+      '.quick-actions { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }',
+      '.reporte-controles { flex-direction: column !important; }',
+      '.week-view { display: none !important; }',
+      // Botones táctiles
+      '.btn { min-height: 44px !important; }',
+      '.table-btn { min-height: 36px !important; padding: 6px 10px !important; }',
+      // Header compacto
+      '.header-brand p { display: none !important; }',
+      '.header-right .user-info { display: none !important; }',
+      // Menú flotante
+      '#mobile-menu-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; }',
+      '#mobile-menu-overlay.open { display:block !important; }',
+      '#mobile-menu-panel { position:fixed; top:0; left:0; width:280px; height:100vh; background:white; z-index:1000; overflow-y:auto; transform:translateX(-100%); transition:transform 0.25s ease; box-shadow: 4px 0 20px rgba(0,0,0,0.2); padding: 16px 12px; }',
+      '#mobile-menu-panel.open { transform:translateX(0) !important; }',
+      '#mobile-menu-close { position:absolute; top:12px; right:12px; background:none; border:none; font-size:22px; cursor:pointer; padding:8px; }',
+      '#mobile-menu-panel .nav-section-title { font-size:10px; font-weight:700; color:#94a3b8; letter-spacing:0.5px; margin: 16px 0 6px; }',
+      '#mobile-menu-panel .nav-btn { display:flex; align-items:center; gap:10px; width:100%; padding:12px 10px; border:none; background:none; border-radius:8px; font-size:14px; cursor:pointer; color:#1e293b; text-align:left; }',
+      '#mobile-menu-panel .nav-btn:hover, #mobile-menu-panel .nav-btn.active { background:#e8eef3; color:#4a6a84; font-weight:600; }',
+      '#mobile-menu-panel .nav-btn .icon { font-size:18px; width:24px; text-align:center; }',
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+})();
 try {
 // Configurar fecha por defecto (con try-catch por si algún elemento no existe)
 try {
@@ -3400,8 +3558,8 @@ error.textContent = 'Tiempo de espera agotado. Intenta de nuevo.';
 error.classList.add('show');
 }, 15000);
 console.log('Enviando login para usuario:', user);
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('doLogin', [user, pass],
+function(res) {
 console.log('Respuesta de login:', res);
 clearTimeout(loginTimeout);
 btn.disabled = false;
@@ -3418,8 +3576,8 @@ console.log('Login fallido:', res);
 error.textContent = (res && res.error) ? res.error : 'Error de autenticación';
 error.classList.add('show');
 }
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 console.error('Error en login:', err);
 clearTimeout(loginTimeout);
 btn.disabled = false;
@@ -3427,13 +3585,12 @@ btn.textContent = 'Iniciar Sesión';
 error.textContent = 'Error de conexión: ' + (err && err.message ? err.message : 'Verifica tu conexión e intenta de nuevo');
 error.classList.add('show');
 console.error('Error login:', err);
-})
-.doLogin(user, pass);
+});
 return false;
 }
 function handleLogout() {
 if (currentToken) {
-google.script.run.doLogout(currentToken);
+gasCall('doLogout', [currentToken], function(res){}, function(err){});
 }
 currentToken = null;
 currentUser = null;
@@ -3516,10 +3673,7 @@ appContainer.classList.remove('show');
 // ==================== NAVEGACIÓN ============================
 // ============================================================
 function goToView(viewId) {
-// Cerrar menú móvil
-document.getElementById('sidebar').classList.remove('mobile-open');
-var overlay = document.getElementById('sidebarOverlay');
-if (overlay) overlay.classList.remove('show');
+// Sidebar siempre visible — no se cierra al navegar
 // Ocultar todas las vistas
 document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
 document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -3536,21 +3690,33 @@ if (viewId === 'espacios') cargarEspacios();
 if (viewId === 'finanzas') cargarFinanzas();
 }
 function toggleMobileMenu() {
-var sidebar = document.getElementById('sidebar');
-var overlay = document.getElementById('sidebarOverlay');
-var isOpen = sidebar.classList.contains('mobile-open');
+if (window._esMovil) {
+var panel = document.getElementById('mobile-menu-panel');
+var overlay = document.getElementById('mobile-menu-overlay');
+var isOpen = panel && panel.classList.contains('open');
 if (isOpen) {
-sidebar.classList.remove('mobile-open');
-overlay.classList.remove('show');
+if (panel) panel.classList.remove('open');
+if (overlay) overlay.classList.remove('open');
 } else {
-sidebar.classList.add('mobile-open');
-overlay.classList.add('show');
+if (panel) panel.classList.add('open');
+if (overlay) overlay.classList.add('open');
+var mobileUser = document.getElementById('mobile-user-name');
+if (mobileUser && currentUser) mobileUser.textContent = currentUser;
+}
+} else {
+var layout = document.querySelector('.layout');
+if (layout) layout.classList.toggle('sidebar-collapsed');
 }
 }
 function closeMobileMenu() {
-document.getElementById('sidebar').classList.remove('mobile-open');
-var overlay = document.getElementById('sidebarOverlay');
-if (overlay) overlay.classList.remove('show');
+var panel = document.getElementById('mobile-menu-panel');
+var overlay = document.getElementById('mobile-menu-overlay');
+var sidebar = document.getElementById('sidebar');
+var sOverlay = document.getElementById('sidebarOverlay');
+if (panel) panel.classList.remove('open');
+if (overlay) overlay.classList.remove('open');
+if (sidebar) sidebar.classList.remove('mobile-open');
+if (sOverlay) sOverlay.classList.remove('show');
 }
 // ============================================================
 // ==================== DASHBOARD =============================
@@ -3560,8 +3726,8 @@ if (!currentToken) {
 console.log('No hay token para cargar dashboard');
 return;
 }
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getDashboardMetrics', [currentToken],
+function(res) {
 if (res && res.ok) {
 document.getElementById('metric-activos').textContent = res.activos || 0;
 document.getElementById('metric-bajas').textContent = res.bajas || 0;
@@ -3577,23 +3743,21 @@ mostrarAlertas(res.alertas);
 } else {
 console.log('Error en dashboard:', res ? res.error : 'Respuesta vacía');
 }
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 console.error('Error cargando dashboard:', err);
-})
-.getDashboardMetrics(currentToken);
+});
 // Cargar citas de hoy
 try {
 var hoy = new Date().toISOString().split('T')[0];
-google.script.run
-.withSuccessHandler(function(citas) {
+gasCall('listAppointmentsByDate', [currentToken, hoy, ''],
+function(citas) {
 renderCitasHoy(citas);
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 console.error('Error cargando citas de hoy:', err);
 document.getElementById('citas-hoy-body').innerHTML = '<tr><td colspan="5" class="empty-state">Error al cargar citas</td></tr>';
-})
-.listAppointmentsByDate(currentToken, hoy, '');
+});
 } catch(e) {
 console.error('Error iniciando carga de citas:', e);
 }
@@ -3656,14 +3820,16 @@ return '<tr>' +
 }
 function filtrarCitasHoy(filtro) {
 var hoy = new Date().toISOString().split('T')[0];
-google.script.run
-.withSuccessHandler(function(citas) {
+gasCall('listAppointmentsByDate', [currentToken, hoy, filtro === 'todos' ? '' : filtro],
+function(citas) {
 if (filtro !== 'todos') {
 citas = citas.filter(function(c) { return c.EstatusCita === filtro; });
 }
 renderCitasHoy(citas);
-})
-.listAppointmentsByDate(currentToken, hoy, filtro === 'todos' ? '' : filtro);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 // ============================================================
 // ==================== WIZARD PACIENTE =======================
@@ -3777,8 +3943,8 @@ Madre: document.getElementById('w_f_madre').value.trim(),
 Padre: document.getElementById('w_f_padre').value.trim(),
 TipoFamilia: document.getElementById('w_f_tipo_familia').value
 };
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('addPatient', [currentToken, { maestro: maestro, escolares: escolares, familia: familia }],
+function(res) {
 if (res.ok) {
 showToast('Paciente registrado: ' + res.patientId, 'success');
 goToView('dashboard');
@@ -3786,8 +3952,10 @@ resetWizard();
 } else {
 showToast('Error: ' + (res.error || 'No se pudo guardar'), 'error');
 }
-})
-.addPatient(currentToken, { maestro: maestro, escolares: escolares, familia: familia });
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function resetWizard() {
 document.querySelectorAll('#view-alta input, #view-alta select').forEach(function(el) {
@@ -3847,8 +4015,8 @@ return true;
 function buscar() {
 var q = document.getElementById('b_q').value.trim();
 if (!q) return;
-google.script.run
-.withSuccessHandler(function(lista) {
+gasCall('searchPatients', [currentToken, q],
+function(lista) {
 var tbody = document.getElementById('b_res');
 if (!lista || lista.length === 0) {
 tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Sin resultados</td></tr>';
@@ -3870,8 +4038,10 @@ return '<tr>' +
 '</td>' +
 '</tr>';
 }).join('');
-})
-.searchPatients(currentToken, q);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function verPaciente(id) {
 selectedPatientId = id;
@@ -3884,8 +4054,8 @@ cargarDetallePaciente();
 function buscarParaHistorial() {
 var q = document.getElementById('h_search').value.trim();
 if (!q) return;
-google.script.run
-.withSuccessHandler(function(lista) {
+gasCall('searchPatients', [currentToken, q],
+function(lista) {
 var container = document.getElementById('h_search_results');
 if (!lista || lista.length === 0) {
 container.innerHTML = '<p class="empty-state">Sin resultados</p>';
@@ -3898,8 +4068,10 @@ sanitize(p.NombreCompleto) + ' (' + sanitize(p.PatientID) + ')' +
 '</button>';
 }).join('') +
 '</div>';
-})
-.searchPatients(currentToken, q);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function seleccionarPacienteHistorial(id, nombre) {
 selectedPatientId = id;
@@ -3910,8 +4082,8 @@ function cargarDetallePaciente() {
 if (!selectedPatientId) return;
 document.getElementById('patient-selector-card').style.display = 'none';
 document.getElementById('patient-detail-section').style.display = 'block';
-google.script.run
-.withSuccessHandler(function(bundle) {
+gasCall('getPatientBundle', [currentToken, selectedPatientId],
+function(bundle) {
 if (!bundle) {
 showToast('No se encontró el paciente', 'error');
 return;
@@ -3950,8 +4122,10 @@ renderNotasPaciente(bundle.sessions || []);
 cargarChecklistPaciente(bundle.checklist, r.EsMenor);
 // Cargar plantillas
 cargarPlantillasSelect();
-})
-.getPatientBundle(currentToken, selectedPatientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function volverBuscadorHistorial() {
 document.getElementById('patient-selector-card').style.display = 'block';
@@ -4023,8 +4197,8 @@ familia: {
 TipoFamilia: document.getElementById('upd_tipo_familia').value
 }
 };
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('updatePatientBundle', [currentToken, payload],
+function(res) {
 if (res.ok) {
 showToast('Datos actualizados', 'success');
 cerrarFormActualizar();
@@ -4032,20 +4206,24 @@ cargarDetallePaciente();
 } else {
 document.getElementById('upd_msg').textContent = res.error || 'Error';
 }
-})
-.updatePatientBundle(currentToken, payload);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 // ============================================================
 // ==================== NOTAS SOAP ============================
 // ============================================================
 function cargarPlantillas() {
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getPlantillasNotas', [currentToken],
+function(res) {
 if (res.ok) {
 plantillasNotas = res.data || [];
 }
-})
-.getPlantillasNotas(currentToken);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function cargarPlantillasSelect() {
 var select = document.getElementById('s_plantilla');
@@ -4078,8 +4256,8 @@ SOAP_Plan: document.getElementById('s_plan').value,
 PruebasAplicadas: document.getElementById('s_pruebas').value,
 PlantillaUsada: document.getElementById('s_plantilla').value
 };
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('addSessionNote', [currentToken, payload],
+function(res) {
 if (res.ok) {
 showToast('Nota SOAP guardada', 'success');
 document.getElementById('s_subjetivo').value = '';
@@ -4092,8 +4270,10 @@ cargarDetallePaciente();
 } else {
 document.getElementById('sesion_msg').textContent = res.error || 'Error';
 }
-})
-.addSessionNote(currentToken, payload);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function verNotaSOAP(sessionId) {
 // Implementar vista detallada de nota SOAP
@@ -4121,15 +4301,17 @@ return '<div class="checklist-item ' + (item.requerido ? 'checklist-required' : 
 }).join('') +
 '</div>';
 // Cargar link de carpeta
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('obtenerCarpetaPaciente', [currentToken, selectedPatientId],
+function(res) {
 if (res.ok && res.carpetaUrl) {
 var link = document.getElementById('checklist-carpeta-link');
 link.href = res.carpetaUrl;
 link.style.display = 'inline-flex';
 }
-})
-.obtenerCarpetaPaciente(currentToken, selectedPatientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function toggleChecklistItem(checkbox) {
 var itemId = checkbox.dataset.id;
@@ -4141,15 +4323,17 @@ checkbox.parentElement.querySelector('.checklist-text').classList.toggle('comple
 }
 function guardarChecklist() {
 if (!selectedPatientId) return;
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('saveChecklistPaciente', [currentToken, selectedPatientId, checklistData],
+function(res) {
 if (res.ok) {
 showToast('Checklist guardado', 'success');
 } else {
 document.getElementById('checklist_msg').textContent = res.error || 'Error';
 }
-})
-.saveChecklistPaciente(currentToken, selectedPatientId, checklistData);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function getChecklistDefault(esMenor) {
 return esMenor ? [
@@ -4217,8 +4401,8 @@ renderAgendaMes(fechaInput);
 function renderAgendaDia(fecha) {
 var container = document.getElementById('agenda-container');
 container.innerHTML = '<div class="day-view" id="day-view-container"><div class="loading">Cargando\...</div></div>';
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getEspaciosLibresCompleto', [currentToken, fecha, 60],
+function(res) {
 if (!res.ok) {
 container.innerHTML = '<p class="empty-state">Error al cargar agenda</p>';
 return;
@@ -4238,8 +4422,10 @@ html += '<div class="hour-label">' + hora + '</div>' +
 }
 }
 container.querySelector('.day-view').innerHTML = html;
-})
-.getEspaciosLibresCompleto(currentToken, fecha, 60);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function renderAgendaSemana(fechaBase) {
 var container = document.getElementById('agenda-container');
@@ -4281,8 +4467,8 @@ cargarDatosDiaSemana(fechaStr);
 }
 }
 function cargarDatosDiaSemana(fecha) {
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getEspaciosLibresCompleto', [currentToken, fecha, 60],
+function(res) {
 if (!res.ok) return;
 var ocupados = res.ocupados || [];
 var disponibles = res.disponibles || [];
@@ -4302,8 +4488,10 @@ slot.onclick = function() { agendarEnHora(fecha, hora); };
 slot.textContent = '-';
 }
 });
-})
-.getEspaciosLibresCompleto(currentToken, fecha, 60);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function renderAgendaMes(fechaBase) {
 var container = document.getElementById('agenda-container');
@@ -4342,8 +4530,8 @@ cargarDatosDiaMes(fechaStr);
 }
 }
 function cargarDatosDiaMes(fecha) {
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getEspaciosLibresCompleto', [currentToken, fecha, 60],
+function(res) {
 if (!res.ok) return;
 var diaEl = document.querySelector('.month-day[data-fecha="' + fecha + '"]');
 if (!diaEl) return;
@@ -4367,8 +4555,10 @@ count.className = 'appointments-count';
 count.textContent = ocupados.length;
 diaEl.appendChild(count);
 }
-})
-.getEspaciosLibresCompleto(currentToken, fecha, 60);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function agendarEnHora(fecha, hora) {
 document.getElementById('a_fecha').value = fecha;
@@ -4380,8 +4570,8 @@ goToView('agendar');
 // ============================================================
 function cargarPacientesParaAgendar() {
 if (!currentToken) return;
-google.script.run
-.withSuccessHandler(function(lista) {
+gasCall('searchPatients', [currentToken, ''],
+function(lista) {
 var select = document.getElementById('a_paciente');
 if (!select) return;
 if (!lista || lista.length === 0) {
@@ -4392,18 +4582,17 @@ select.innerHTML = '<option value="">(Seleccionar paciente)</option>' +
 lista.map(function(p) {
 return '<option value="' + sanitizeAttr(p.PatientID) + '" data-nombre="' + sanitizeAttr(p.NombreCompleto) + '">' + sanitize(p.NombreCompleto) + '</option>';
 }).join('');
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 console.error('Error cargando pacientes:', err);
 var select = document.getElementById('a_paciente');
 if (select) select.innerHTML = '<option value="">(Error al cargar)</option>';
-})
-.searchPatients(currentToken, '');
+});
 }
 function cargarPsicologos() {
 if (!currentToken) return;
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getPsicologos', [currentToken],
+function(res) {
 if (res && res.ok) {
 psicologos = res.data || [];
 var select = document.getElementById('a_psicologo');
@@ -4414,30 +4603,31 @@ return '<option value="' + p.PsicologoID + '">' + p.Nombre + '</option>';
 }).join('');
 }
 }
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 console.error('Error cargando psicólogos:', err);
-})
-.getPsicologos(currentToken);
+});
 }
 function verificarContactoEmergenciaCita() {
 var patientId = document.getElementById('a_paciente').value;
 if (!patientId) return;
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('verificarContactoEmergencia', [currentToken, patientId],
+function(res) {
 if (res.ok && !res.tieneContacto) {
 showToast('⚠️ El paciente no tiene contacto de emergencia registrado. Regístrelo antes de agendar.', 'warning');
 }
-})
-.verificarContactoEmergencia(currentToken, patientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function cargarEspaciosLibresCita() {
 var fecha = document.getElementById('a_fecha').value;
 if (!fecha) return;
 var container = document.getElementById('espacios-libres-cita');
 container.innerHTML = '<h4 style="margin-bottom:12px;">Espacios Libres</h4><p class="empty-state">Consultando disponibilidad...</p>';
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getEspaciosLibres', [currentToken, fecha, 60],
+function(res) {
 var disponibles = [];
 if (res && res.ok && res.disponibles) {
 disponibles = res.disponibles;
@@ -4467,11 +4657,10 @@ return libre
 } else {
 container.innerHTML = '<h4 style="margin-bottom:8px;">Espacios Libres</h4><p class="empty-state">Todas las horas disponibles — selecciona en el campo Hora</p>';
 }
-})
-.withFailureHandler(function() {
-container.innerHTML = '<h4 style="margin-bottom:8px;">Espacios Libres</h4><p class="empty-state">No se pudo cargar disponibilidad — selecciona hora manualmente</p>';
-})
-.getEspaciosLibres(currentToken, fecha, 60);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function agendar() {
 var pacienteId = document.getElementById('a_paciente').value;
@@ -4499,8 +4688,8 @@ PsicologoID: psicologoId,
 Motivo: motivo,
 EstatusCita: 'PROGRAMADA'
 };
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('addAppointment', [currentToken, payload],
+function(res) {
 if (res.ok) {
 showToast('Cita agendada: ' + res.citaId, 'success');
 document.getElementById('a_paciente').value = '';
@@ -4511,8 +4700,10 @@ cargarEspaciosLibresCita();
 } else {
 document.getElementById('a_msg').textContent = res.error || 'Error';
 }
-})
-.addAppointment(currentToken, payload);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 // ============================================================
 // ==================== CONFIRMAR CITAS =======================
@@ -4520,8 +4711,8 @@ document.getElementById('a_msg').textContent = res.error || 'Error';
 function cargarConfirmaciones() {
 var fecha = document.getElementById('conf_fecha').value;
 if (!fecha) return;
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getConfirmacionesPendientes', [currentToken, fecha],
+function(res) {
 if (!res.ok) {
 document.getElementById('conf_body').innerHTML = '<tr><td colspan="5" class="empty-state">Error al cargar</td></tr>';
 return;
@@ -4545,20 +4736,24 @@ return '<tr>' +
 '</td>' +
 '</tr>';
 }).join('');
-})
-.getConfirmacionesPendientes(currentToken, fecha);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function actualizarConfirmacion(citaId, estatus) {
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('actualizarConfirmacion', [currentToken, citaId, estatus],
+function(res) {
 if (res.ok) {
 showToast('Confirmación actualizada', 'success');
 cargarConfirmaciones();
 } else {
 showToast('Error: ' + res.error, 'error');
 }
-})
-.actualizarConfirmacion(currentToken, citaId, estatus);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 // ============================================================
 // ==================== ESTATUS CITAS =========================
@@ -4566,8 +4761,8 @@ showToast('Error: ' + res.error, 'error');
 function cargarCitasParaEstatus() {
 var fecha = document.getElementById('estatus_fecha').value;
 if (!fecha) return;
-google.script.run
-.withSuccessHandler(function(citas) {
+gasCall('listAppointmentsByDate', [currentToken, fecha, ''],
+function(citas) {
 var tbody = document.getElementById('estatus_body');
 if (!citas || citas.length === 0) {
 tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay citas para esta fecha</td></tr>';
@@ -4588,8 +4783,10 @@ return '<tr>' +
 '</td>' +
 '</tr>';
 }).join('');
-})
-.listAppointmentsByDate(currentToken, fecha, '');
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function cambiarEstatusCita(citaId, estatus) {
 if (estatus === 'REALIZADA') {
@@ -4601,8 +4798,8 @@ return;
 _cambiarEstatusCita(citaId, estatus);
 }
 function _cambiarEstatusCita(citaId, estatus) {
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('cambiarEstatusCita', [currentToken, citaId, estatus],
+function(res) {
 if (res.ok) {
 showToast('Estatus actualizado a ' + estatus, 'success');
 cargarCitasParaEstatus();
@@ -4610,8 +4807,10 @@ loadDashboard();
 } else {
 showToast('Error: ' + res.error, 'error');
 }
-})
-.cambiarEstatusCita(currentToken, citaId, estatus);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function confirmarCancelarCita(citaId) {
 showConfirmModal(
@@ -4628,13 +4827,15 @@ _cambiarEstatusCita(citaId, 'CANCELADA');
 // ============================================================
 function verificarPrimeraSesion(citaId) {
 // Verificar si es primera sesión del paciente
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getPatientBundle', [currentToken, selectedPatientId],
+function(res) {
 // Por simplicidad, mostramos el popup siempre para citas REALIZADA
 // En producción, verificar si es la primera cita realizada del paciente
 mostrarRiesgoPopup(citaId);
-})
-.getPatientBundle(currentToken, selectedPatientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function mostrarRiesgoPopup(citaId) {
 selectedCitaId = citaId;
@@ -4671,8 +4872,8 @@ showToast('El plan de seguridad es obligatorio para riesgo medio/alto', 'warning
 return;
 }
 }
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('guardarEvaluacionRiesgo', [currentToken, selectedCitaId, riesgo.value, planSeguridad],
+function(res) {
 if (res.ok) {
 cerrarRiesgoPopup();
 _cambiarEstatusCita(selectedCitaId, 'REALIZADA');
@@ -4680,8 +4881,10 @@ showToast('Evaluación de riesgo guardada', 'success');
 } else {
 showToast('Error: ' + res.error, 'error');
 }
-})
-.guardarEvaluacionRiesgo(currentToken, selectedCitaId, riesgo.value, planSeguridad);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 // ============================================================
 // ==================== ESPACIOS LIBRES =======================
@@ -4692,8 +4895,8 @@ var duracion = document.getElementById('esp_duracion').value;
 if (!fecha) return;
 var container = document.getElementById('espacios-container');
 container.innerHTML = '<p class="empty-state">Cargando\...</p>';
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getEspaciosLibresCompleto', [currentToken, fecha, parseInt(duracion)],
+function(res) {
 if (!res.ok) {
 container.innerHTML = '<p class="empty-state">Error al cargar espacios</p>';
 return;
@@ -4722,8 +4925,10 @@ return '<tr><td>' + o.hora + '-' + o.horaFin + '</td><td>' + o.paciente + '</td>
 '</tbody></table></div>';
 }
 container.innerHTML = html;
-})
-.getEspaciosLibresCompleto(currentToken, fecha, parseInt(duracion));
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function irAAgendar(fecha, hora) {
 document.getElementById('a_fecha').value = fecha;
@@ -4767,8 +4972,8 @@ return;
 }
 var tbody = document.getElementById('rep_body');
 tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Generando reporte...</td></tr>';
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('listAppointmentsByRange', [currentToken, desde, hasta, ''],
+function(res) {
 // Backend devuelve array directamente
 var citas = Array.isArray(res) ? res : (res && res.data ? res.data : null);
 if (!citas) {
@@ -4811,11 +5016,10 @@ html += '<td style="color:var(--text-muted);">-</td>';
 html += '</tr>';
 }
 tbody.innerHTML = html;
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error de conexión: ' + (err.message || '') + '</td></tr>';
-})
-.listAppointmentsByRange(currentToken, desde, hasta, '');
+});
 }
 function exportarReporte() {
 var desde = document.getElementById('rep_desde').value;
@@ -4825,8 +5029,8 @@ showToast('Selecciona fechas primero', 'warning');
 return;
 }
 showToast('Preparando CSV...', 'info');
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('listAppointmentsByRange', [currentToken, desde, hasta, ''],
+function(res) {
 var citas = Array.isArray(res) ? res : (res && res.data ? res.data : null);
 if (!citas || citas.length === 0) {
 showToast('Sin datos para exportar en ese rango', 'warning');
@@ -4845,11 +5049,10 @@ a.download = 'reporte_citas_' + desde + '_al_' + hasta + '.csv';
 a.click();
 URL.revokeObjectURL(url);
 showToast('CSV descargado (' + citas.length + ' citas)', 'success');
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 showToast('Error al exportar: ' + (err.message || ''), 'error');
-})
-.listAppointmentsByRange(currentToken, desde, hasta, '');
+});
 }
 // ============================================================
 // ==================== FINANZAS ==============================
@@ -4882,8 +5085,8 @@ var hoyISO = yyyy + '-' + mm + '-' + dd;
 document.getElementById('fin_fecha_hoy').textContent = dd + '/' + mm + '/' + yyyy;
 document.getElementById('fin_ultima_actualizacion').textContent = 'Actualizado: ' + hoy.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
 // Citas de hoy
-google.script.run
-.withSuccessHandler(function(citas) {
+gasCall('listAppointmentsByDate', [currentToken, hoyISO, ''],
+function(citas) {
 citas = Array.isArray(citas) ? citas : [];
 var realizadas = citas.filter(function(c){ return c.EstatusCita === 'REALIZADA'; }).length;
 var canceladas = citas.filter(function(c){ return c.EstatusCita === 'CANCELADA'; }).length;
@@ -4891,19 +5094,23 @@ var noAsistio = citas.filter(function(c){ return c.EstatusCita === 'NO ASISTIO' 
 document.getElementById('fin_hoy_realizadas').textContent = realizadas;
 document.getElementById('fin_hoy_canceladas').textContent = canceladas;
 document.getElementById('fin_hoy_noasistio').textContent = noAsistio;
-})
-.listAppointmentsByDate(currentToken, hoyISO, '');
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 // Ingresos del día y semana
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getDashboardMetrics', [currentToken],
+function(res) {
 if (res && res.ok) {
 document.getElementById('fin_hoy_ingresos').textContent = '$' + (res.ingresosHoy || 0).toFixed(2);
 document.getElementById('fin_semana_ingresos').textContent = '$' + (res.ingresosSemana || 0).toFixed(2);
 document.getElementById('fin_hoy_promedio').textContent = res.citasHoy > 0
 ? '$' + ((res.ingresosHoy || 0) / res.citasHoy).toFixed(2) : '$0';
 }
-})
-.getDashboardMetrics(currentToken);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 
 // ---------- TAB 1: INGRESOS POR PERÍODO ----------
@@ -4913,8 +5120,8 @@ var hasta = document.getElementById('fin_hasta').value;
 if (!desde || !hasta) { showToast('Selecciona fechas válidas', 'warning'); return; }
 document.getElementById('fin_body').innerHTML = '<tr><td colspan="6" class="empty-state">Cargando...</td></tr>';
 document.getElementById('rpt_metodos_body').innerHTML = '<tr><td colspan="4" class="empty-state">Cargando...</td></tr>';
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('listFinanzasByRange', [currentToken, desde, hasta],
+function(res) {
 var lista = Array.isArray(res) ? res : (res && res.data ? res.data : []);
 // Métricas generales
 var total = lista.reduce(function(s,f){ return s + (parseFloat(f.Monto)||0); }, 0);
@@ -4946,12 +5153,11 @@ document.getElementById('rpt_metodos_body').innerHTML = metHTML;
 // Tabla detalle
 renderFinanzasDetalle(lista, 'fin_body');
 showToast('Reporte generado: ' + num + ' registros', 'success');
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 document.getElementById('fin_body').innerHTML = '<tr><td colspan="6" class="empty-state">Error al cargar</td></tr>';
 showToast('Error de conexión', 'error');
-})
-.listFinanzasByRange(currentToken, desde, hasta);
+});
 }
 
 function renderFinanzasDetalle(lista, tbodyId) {
@@ -4980,8 +5186,8 @@ function exportarFinanzasCSV() {
 var desde = document.getElementById('fin_desde') ? document.getElementById('fin_desde').value : '';
 var hasta = document.getElementById('fin_hasta') ? document.getElementById('fin_hasta').value : '';
 if (!desde || !hasta) { showToast('Selecciona un rango de fechas en la pestaña de Ingresos primero', 'warning'); return; }
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('listFinanzasByRange', [currentToken, desde, hasta],
+function(res) {
 var lista = Array.isArray(res) ? res : (res && res.data ? res.data : []);
 if (lista.length === 0) { showToast('Sin datos en ese rango', 'warning'); return; }
 var csv = '\uFEFFID,Fecha,Paciente/Concepto,Monto,Método Pago,Factura\n';
@@ -4995,8 +5201,10 @@ var a = document.createElement('a');
 a.href = url; a.download = 'finanzas_' + desde + '_al_' + hasta + '.csv'; a.click();
 URL.revokeObjectURL(url);
 showToast('CSV descargado (' + lista.length + ' registros)', 'success');
-})
-.listFinanzasByRange(currentToken, desde, hasta);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 
 // ---------- TAB 2: OCUPACIÓN Y ASISTENCIA ----------
@@ -5004,8 +5212,8 @@ function generarReporteOcupacion() {
 var desde = document.getElementById('oc_desde').value;
 var hasta = document.getElementById('oc_hasta').value;
 if (!desde || !hasta) { showToast('Selecciona fechas válidas', 'warning'); return; }
-google.script.run
-.withSuccessHandler(function(citas) {
+gasCall('listAppointmentsByRange', [currentToken, desde, hasta, ''],
+function(citas) {
 citas = Array.isArray(citas) ? citas : [];
 var realizadas = 0, canceladas = 0, noAsistio = 0, programadas = 0;
 var porPsicologo = {};
@@ -5059,9 +5267,10 @@ return '<tr><td>' + sanitize(p) + '</td><td>' + d.realizadas + '</td><td>' + d.c
 : '<tr><td colspan="6" class="empty-state">Sin datos en el período</td></tr>';
 document.getElementById('oc_psicologo_body').innerHTML = psiHTML;
 showToast('Reporte de ocupación generado: ' + total + ' citas', 'success');
-})
-.withFailureHandler(function() { showToast('Error al cargar citas', 'error'); })
-.listAppointmentsByRange(currentToken, desde, hasta, '');
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 
 // ---------- TAB 3: PACIENTES NUEVOS Y RETENCIÓN ----------
@@ -5073,8 +5282,8 @@ if (!desde || !hasta) { showToast('Selecciona fechas válidas', 'warning'); retu
 document.getElementById('ret_nuevos_body').innerHTML = '<tr><td colspan="5" class="empty-state">Cargando...</td></tr>';
 document.getElementById('ret_abandono_body').innerHTML = '<tr><td colspan="5" class="empty-state">Cargando...</td></tr>';
 // Obtener todos los pacientes
-google.script.run
-.withSuccessHandler(function(pacientes) {
+gasCall('searchPatients', [currentToken, ''],
+function(pacientes) {
 pacientes = Array.isArray(pacientes) ? pacientes : [];
 // Nuevos en el período (FechaAlta en el rango)
 var nuevos = pacientes.filter(function(p) {
@@ -5098,8 +5307,8 @@ return '<tr><td>' + sanitize(p.NombreCompleto||'--') + '</td><td>' + sanitize(p.
 var hoy = new Date();
 var limiteFecha = new Date(hoy.getTime() - diasSinCita * 24 * 60 * 60 * 1000);
 var limiteFechaISO = limiteFecha.toISOString().split('T')[0];
-google.script.run
-.withSuccessHandler(function(citas) {
+gasCall('listAppointmentsByRange', [currentToken, '2020-01-01', hoy.toISOString().split('T')[0], ''],
+function(citas) {
 citas = Array.isArray(citas) ? citas : [];
 // Última cita por paciente
 var ultimaCita = {};
@@ -5130,10 +5339,12 @@ return '<tr><td>' + sanitize(p.NombreCompleto||'--') + '</td>' +
 '<td>' + waLink + '</td></tr>';
 }).join('')
 : '<tr><td colspan="5" class="empty-state">¡Todos los pacientes tienen cita reciente! 🎉</td></tr>';
-})
-.listAppointmentsByRange(currentToken, '2020-01-01', hoy.toISOString().split('T')[0], '');
-})
-.searchPatients(currentToken, '');
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
+},
+function(err) { showToast('Error cargando pacientes', 'error'); });
 }
 
 function cargarFinanzas() {
@@ -5151,8 +5362,8 @@ var el = document.getElementById(id);
 if (el && !el.value) el.value = hoyISO;
 });
 // Cargar tab de pagos
-google.script.run
-.withSuccessHandler(function(lista) {
+gasCall('listFinanzas', [currentToken, ''],
+function(lista) {
 lista = Array.isArray(lista) ? lista : [];
 document.getElementById('fin_total_label').textContent = '';
 renderFinanzasDetalle(lista, 'fin_body_pagos');
@@ -5160,8 +5371,10 @@ var total = lista.reduce(function(s,f){ return s + (parseFloat(f.Monto)||0); }, 
 document.getElementById('fin_ingresos').textContent = '$' + total.toFixed(2);
 document.getElementById('fin_citas').textContent = lista.length;
 document.getElementById('fin_promedio').textContent = lista.length > 0 ? '$' + (total/lista.length).toFixed(2) : '$0.00';
-})
-.listFinanzas(currentToken, '');
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function filtrarFinanzasPorRango() {
 var desde = document.getElementById('fin_desde').value;
@@ -5199,14 +5412,16 @@ document.getElementById('fin_citas').textContent = citas;
 document.getElementById('fin_promedio').textContent = citas > 0 ? '$' + (total / citas).toFixed(2) : '$0.00';
 }
 function filtrarFinanzas(filtro) {
-google.script.run
-.withSuccessHandler(function(lista) {
+gasCall('listFinanzas', [currentToken, ''],
+function(lista) {
 if (filtro !== 'todos') {
 lista = lista.filter(function(f) { return f.MetodoPago === filtro; });
 }
 renderFinanzas(lista);
-})
-.listFinanzas(currentToken, '');
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function registrarPagoFinanza(registroId) {
 showToast('Función en desarrollo', 'info');
@@ -5217,8 +5432,8 @@ showToast('Función en desarrollo', 'info');
 function buscarParaHistorialClinico() {
 var q = document.getElementById('hc_search').value.trim();
 if (!q) return;
-google.script.run
-.withSuccessHandler(function(lista) {
+gasCall('searchPatients', [currentToken, q],
+function(lista) {
 var container = document.getElementById('hc_search_results');
 if (!lista || lista.length === 0) {
 container.innerHTML = '<p class="empty-state">Sin resultados</p>';
@@ -5231,8 +5446,10 @@ sanitize(p.NombreCompleto) + ' (' + sanitize(p.PatientID) + ')' +
 '</button>';
 }).join('') +
 '</div>';
-})
-.searchPatients(currentToken, q);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function seleccionarPacienteHC(id, nombre) {
 selectedPatientId = id;
@@ -5243,8 +5460,8 @@ function cargarDetalleHistorialClinico() {
 if (!selectedPatientId) return;
 document.getElementById('hc-selector-card').style.display = 'none';
 document.getElementById('hc-detail-section').style.display = 'block';
-google.script.run
-.withSuccessHandler(function(bundle) {
+gasCall('getPatientBundle', [currentToken, selectedPatientId],
+function(bundle) {
 if (!bundle) {
 showToast('No se encontró el paciente', 'error');
 return;
@@ -5370,8 +5587,10 @@ renderHCAdeudos(adeudos);
 // Configurar fecha por defecto para nueva nota
 document.getElementById('hc_nota_fecha').value = new Date().toISOString().split('T')[0];
 document.getElementById('hc_nota_numero').value = (bundle.sessions || []).length + 1;
-})
-.getPatientBundle(currentToken, selectedPatientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function calcularEdadDesdeFecha(fechaNac) {
 if (!fechaNac) return '--';
@@ -5493,8 +5712,8 @@ showToast('Función en desarrollo', 'info');
 // ============================================================
 function abrirEditorHC() {
 if (!selectedPatientId) return;
-google.script.run
-.withSuccessHandler(function(h) {
+gasCall('getHistorialClinico', [currentToken, selectedPatientId],
+function(h) {
 h = h || {};
 var sv = function(id, val) {
 var el = document.getElementById(id);
@@ -5575,11 +5794,10 @@ sv('hce_aviso',               h.AvisoPrivacidad);
 sv('hce_contrato',            h.ContratoTerapeutico);
 var msg = document.getElementById('hce_msg');
 if (msg) { msg.textContent = ''; }
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 showToast('Error al cargar datos del historial', 'error');
-})
-.getHistorialClinico(currentToken, selectedPatientId);
+});
 }
 function guardarHistorialClinico() {
 if (!selectedPatientId) {
@@ -5667,8 +5885,8 @@ ContratoTerapeutico:            gv('hce_contrato')
 };
 var msgEl = document.getElementById('hce_msg');
 if (msgEl) { msgEl.textContent = 'Guardando...'; msgEl.style.color = 'var(--text-secondary)'; }
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('saveHistorialClinico', [currentToken, payload],
+function(res) {
 if (res && res.ok) {
 showToast('Historial clínico guardado correctamente', 'success');
 if (msgEl) { msgEl.textContent = '✓ Guardado'; msgEl.style.color = 'var(--success)'; }
@@ -5678,12 +5896,11 @@ var errMsg = (res && res.error) ? res.error : 'Error desconocido';
 showToast('Error al guardar: ' + errMsg, 'error');
 if (msgEl) { msgEl.textContent = '✗ ' + errMsg; msgEl.style.color = 'var(--danger)'; }
 }
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 showToast('Error de conexión al guardar historial', 'error');
 if (msgEl) { msgEl.textContent = '✗ Error de conexión'; msgEl.style.color = 'var(--danger)'; }
-})
-.saveHistorialClinico(currentToken, payload);
+});
 }
 // ============================================================
 // ==================== UTILIDADES ============================
@@ -5744,8 +5961,8 @@ if (!selectedPatientId) {
 showToast('Selecciona un paciente primero', 'warning');
 return;
 }
-google.script.run
-.withSuccessHandler(function(bundle) {
+gasCall('getPatientBundle', [currentToken, selectedPatientId],
+function(bundle) {
 if (!bundle || !bundle.maestro) {
 showToast('No se pudo obtener información del paciente', 'error');
 return;
@@ -5764,8 +5981,10 @@ var nombre = bundle.maestro.NombreCompleto || 'Paciente';
 var mensaje = 'Hola ' + nombre + ', le escribimos del Centro Psicológico Aquí y Ahora A.C. para recordarle su próxima cita. ¿En qué podemos ayudarle?';
 var url = 'https://wa.me/' + telefono.replace(/\+/g, '') + '?text=' + encodeURIComponent(mensaje);
 window.open(url, '_blank');
-})
-.getPatientBundle(currentToken, selectedPatientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function enviarWhatsAppRecordatorio() {
 if (!selectedPatientId) {
@@ -5778,8 +5997,8 @@ if (!fecha || !hora) {
 showToast('Selecciona fecha y hora para la siguiente cita', 'warning');
 return;
 }
-google.script.run
-.withSuccessHandler(function(bundle) {
+gasCall('getPatientBundle', [currentToken, selectedPatientId],
+function(bundle) {
 if (!bundle || !bundle.maestro) {
 showToast('No se pudo obtener información del paciente', 'error');
 return;
@@ -5797,8 +6016,10 @@ var nombre = bundle.maestro.NombreCompleto || '';
 var mensaje = 'Hola ' + nombre + ', le confirmamos su próxima cita en el Centro Psicológico Aquí y Ahora A.C.:\n\n📅 Fecha: ' + fecha + '\n🕐 Hora: ' + hora + '\n\nPor favor confirme su asistencia. ¡Gracias!';
 var url = 'https://wa.me/' + telefono.replace(/\+/g, '') + '?text=' + encodeURIComponent(mensaje);
 window.open(url, '_blank');
-})
-.getPatientBundle(currentToken, selectedPatientId);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function enviarWhatsAppAlerta(tipo, datos) {
 // Función para enviar alertas automáticas desde el dashboard
@@ -5826,8 +6047,8 @@ function cargarEspaciosLibresSiguienteCita() {
 var fecha = document.getElementById('hc_siguiente_fecha').value;
 var duracion = document.getElementById('hc_siguiente_duracion').value;
 if (!fecha) return;
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('getEspaciosLibres', [currentToken, fecha, parseInt(duracion)],
+function(res) {
 if (!res.ok) return;
 var select = document.getElementById('hc_siguiente_hora');
 select.innerHTML = '<option value="">(Seleccionar)</option>' +
@@ -5845,11 +6066,10 @@ return '<div class="espacio-slot" onclick="document.getElementById(\'hc_siguient
 } else {
 container.innerHTML = '<p class="empty-state">No hay espacios disponibles para esta fecha</p>';
 }
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 console.error('Error cargando espacios:', err);
-})
-.getEspaciosLibres(currentToken, fecha, parseInt(duracion));
+});
 }
 function guardarNotaYAgendarCita() {
 if (!selectedPatientId) {
@@ -5867,8 +6087,8 @@ Observaciones: 'Temas: ' + document.getElementById('hc_nota_temas').value +
 '\nTareas: ' + document.getElementById('hc_nota_tareas').value +
 '\nObservaciones: ' + document.getElementById('hc_nota_observaciones').value
 };
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('addSessionNote', [currentToken, notaPayload],
+function(res) {
 if (res.ok) {
 // Ahora agendar la siguiente cita
 var fecha = document.getElementById('hc_siguiente_fecha').value;
@@ -5883,8 +6103,8 @@ DuracionMinutos: parseInt(document.getElementById('hc_siguiente_duracion').value
 Modalidad: document.getElementById('hc_siguiente_modalidad').value,
 EstatusCita: 'PROGRAMADA'
 };
-google.script.run
-.withSuccessHandler(function(citaRes) {
+gasCall('addAppointment', [currentToken, citaPayload],
+function(citaRes) {
 if (citaRes.ok) {
 showToast('Nota guardada y cita agendada correctamente', 'success');
 limpiarFormNota();
@@ -5892,8 +6112,10 @@ cargarDetalleHistorialClinico();
 } else {
 showToast('Nota guardada pero error al agendar cita: ' + citaRes.error, 'warning');
 }
-})
-.addAppointment(currentToken, citaPayload);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 } else {
 showToast('Nota guardada correctamente', 'success');
 limpiarFormNota();
@@ -5901,8 +6123,10 @@ limpiarFormNota();
 } else {
 document.getElementById('hc_nota_msg').textContent = res.error || 'Error al guardar';
 }
-})
-.addSessionNote(currentToken, notaPayload);
+},
+function(err) {
+showToast('Error','error');
+});
 }
 function guardarSoloNota() {
 if (!selectedPatientId) {
@@ -5919,8 +6143,8 @@ Observaciones: 'Temas: ' + document.getElementById('hc_nota_temas').value +
 '\nTareas: ' + document.getElementById('hc_nota_tareas').value +
 '\nObservaciones: ' + document.getElementById('hc_nota_observaciones').value
 };
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('addSessionNote', [currentToken, payload],
+function(res) {
 if (res.ok) {
 showToast('Nota guardada correctamente', 'success');
 limpiarFormNota();
@@ -5928,8 +6152,10 @@ cargarDetalleHistorialClinico();
 } else {
 document.getElementById('hc_nota_msg').textContent = res.error || 'Error al guardar';
 }
-})
-.addSessionNote(currentToken, payload);
+},
+function(err) {
+showToast('Error de conexión', 'error');
+});
 }
 function limpiarFormNota() {
 document.getElementById('hc_nota_fecha').value = '';
@@ -5956,8 +6182,8 @@ return;
 }
 var tbody = document.getElementById('rep_body');
 tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Generando comparativo...</td></tr>';
-google.script.run
-.withSuccessHandler(function(res) {
+gasCall('listAppointmentsByRange', [currentToken, desde, hasta, ''],
+function(res) {
 var citas = Array.isArray(res) ? res : (res && res.data ? res.data : null);
 if (!citas) {
 tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error al generar reporte</td></tr>';
@@ -6014,11 +6240,10 @@ html += '<tr><td colspan="8" style="background:var(--accent-bg);padding:12px;fon
 html += '<strong>Total citas:</strong> ' + totalCitas + ' &nbsp;|&nbsp; <strong>Promedio/día:</strong> ' + (totalCitas/7).toFixed(1) + ' &nbsp;|&nbsp; <strong>Día más ocupado:</strong> ' + maxDia;
 html += '</td></tr>';
 tbody.innerHTML = html;
-})
-.withFailureHandler(function(err) {
+},
+function(err) {
 tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error de conexión: ' + (err.message||'') + '</td></tr>';
-})
-.listAppointmentsByRange(currentToken, desde, hasta, '');
+});
 }
 // ============================================================
 // ==================== LEGACY COMPATIBILITY ==================
