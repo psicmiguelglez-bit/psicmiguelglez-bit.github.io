@@ -3382,13 +3382,9 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycbza1GoQkVpKo5pzuCTwljOqru
 // Función universal que reemplaza google.script.run
 function gasCall(functionName, args, successHandler, failureHandler) {
   var payload = JSON.stringify({ action: functionName, args: args || [] });
-  // Enviar como URL-encoded — formato que GAS lee mejor desde exterior
-  fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'payload=' + encodeURIComponent(payload),
-    redirect: 'follow'
-  })
+  // Usar GET con query param — más confiable con GAS desde dominios externos
+  var url = GAS_URL + '?payload=' + encodeURIComponent(payload);
+  fetch(url, { method: 'GET', redirect: 'follow' })
   .then(function(r) { return r.text(); })
   .then(function(text) {
     try {
