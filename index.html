@@ -1386,6 +1386,21 @@ padding: 6px 10px !important;
 /* Tabla reporte scroll */
 .tabla-reporte-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
+/* ===== RECEPCIÓN ===== */
+.rec-tab-content { display: none; }
+.rec-tab-content.active { display: block; }
+.rec-hoy-row-realizada { opacity: 0.6; }
+.rec-hoy-row-cancelada { opacity: 0.5; background: #fff5f5; }
+.wa-btn { background: #25d366; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+.wa-btn:hover { background: #1da851; }
+.rec-semana-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.rec-semana-table th { background: #4a6a84; color: white; padding: 8px 4px; text-align: center; font-size: 12px; }
+.rec-semana-table td { border: 1px solid #e2e8f0; padding: 4px; text-align: center; font-size: 11px; vertical-align: top; min-height: 40px; }
+.rec-semana-slot-ocupado { background: #fee2e2; border-radius: 4px; padding: 2px 4px; margin: 1px 0; font-size: 10px; color: #b91c1c; }
+.rec-semana-slot-libre { background: #dcfce7; border-radius: 4px; padding: 2px 4px; margin: 1px 0; font-size: 10px; color: #15803d; cursor: pointer; }
+.rec-semana-slot-libre:hover { background: #bbf7d0; }
+.rec-hora-label { font-weight: 600; color: #64748b; font-size: 11px; background: #f8fafc; }
+
 /* ===== POPUP RIESGO SUICIDA ===== */
 .riesgo-popup-overlay {
 display: none;
@@ -2281,6 +2296,183 @@ display: block;
 </div>
 </div>
 </section>
+
+<!-- ===== VISTA RECEPCIÓN ===== -->
+<section id="view-recepcion" class="view">
+<div class="page-header">
+<h2>📋 Panel de Recepción</h2>
+<p>Gestión del día — <span id="rec_fecha_hoy"></span></p>
+</div>
+
+<!-- Tabs recepción -->
+<div class="tabs-container" style="margin-bottom:16px;">
+<button class="tab-btn active" onclick="showRecTab('rec-tab-hoy')">📅 Citas de Hoy</button>
+<button class="tab-btn" onclick="showRecTab('rec-tab-semana')">🗓️ Esta Semana</button>
+<button class="tab-btn" onclick="showRecTab('rec-tab-espacios')">🕐 Espacios Libres</button>
+<button class="tab-btn" onclick="showRecTab('rec-tab-agendar')">➕ Agendar</button>
+</div>
+
+<!-- TAB 1: Citas de hoy -->
+<div id="rec-tab-hoy" class="rec-tab-content active">
+<div class="card">
+<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+<h3>Pacientes de Hoy</h3>
+<button class="btn btn-secondary" onclick="cargarRecepcionHoy()">🔄 Actualizar</button>
+</div>
+<div class="card-body">
+<div id="rec_hoy_loading" class="empty-state">Cargando...</div>
+<table class="data-table" id="rec_hoy_tabla" style="display:none;">
+<thead><tr>
+<th>Hora</th>
+<th>Paciente</th>
+<th>Psicólogo</th>
+<th>Estatus</th>
+<th>WhatsApp</th>
+<th>Confirmar</th>
+</tr></thead>
+<tbody id="rec_hoy_body"></tbody>
+</table>
+<div id="rec_hoy_empty" class="empty-state" style="display:none;">No hay citas programadas para hoy</div>
+</div>
+</div>
+</div>
+
+<!-- TAB 2: Semana -->
+<div id="rec-tab-semana" class="rec-tab-content" style="display:none;">
+<div class="card">
+<div class="card-header">
+<h3>Agenda Semanal</h3>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+<input type="date" id="rec_semana_fecha" onchange="cargarRecepcionSemana()" style="padding:6px;border-radius:6px;border:1px solid #e2e8f0;">
+<button class="btn btn-secondary" onclick="recSemanaAnterior()">← Anterior</button>
+<button class="btn btn-secondary" onclick="recSemanaHoy()">Hoy</button>
+<button class="btn btn-secondary" onclick="recSemanaSiguiente()">Siguiente →</button>
+</div>
+</div>
+<div class="card-body" style="overflow-x:auto;">
+<div id="rec_semana_container"><p class="empty-state">Selecciona una fecha</p></div>
+</div>
+</div>
+</div>
+
+<!-- TAB 3: Espacios libres -->
+<div id="rec-tab-espacios" class="rec-tab-content" style="display:none;">
+<div class="card">
+<div class="card-header">
+<h3>Espacios Disponibles</h3>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+<input type="date" id="rec_espacios_fecha" onchange="cargarRecepcionEspacios()" style="padding:6px;border-radius:6px;border:1px solid #e2e8f0;">
+<select id="rec_espacios_vista" onchange="cargarRecepcionEspacios()" style="padding:6px;border-radius:6px;border:1px solid #e2e8f0;">
+<option value="dia">Vista día</option>
+<option value="semana">Vista semana</option>
+</select>
+</div>
+</div>
+<div class="card-body">
+<div id="rec_espacios_container"><p class="empty-state">Selecciona una fecha</p></div>
+</div>
+</div>
+</div>
+
+<!-- TAB 4: Agendar -->
+<div id="rec-tab-agendar" class="rec-tab-content" style="display:none;">
+<div class="card">
+<div class="card-header">
+<h3>Agendar Cita</h3>
+</div>
+<div class="card-body">
+<!-- Tipo paciente -->
+<div style="display:flex;gap:12px;margin-bottom:16px;">
+<button class="btn btn-primary" id="rec_btn_actual" onclick="recMostrarTipoPaciente('actual')" style="flex:1;">👤 Paciente Actual</button>
+<button class="btn btn-secondary" id="rec_btn_nuevo" onclick="recMostrarTipoPaciente('nuevo')" style="flex:1;">➕ Paciente Nuevo</button>
+</div>
+
+<!-- Buscar paciente actual -->
+<div id="rec_form_actual">
+<div class="form-group">
+<label>Buscar Paciente</label>
+<div style="display:flex;gap:8px;">
+<input type="text" id="rec_buscar_input" placeholder="Nombre o ID del paciente" style="flex:1;">
+<button class="btn btn-primary" onclick="recBuscarPaciente()">🔍 Buscar</button>
+</div>
+</div>
+<div id="rec_buscar_resultados" style="margin-bottom:12px;"></div>
+<div id="rec_paciente_seleccionado" style="display:none;background:#e8f5e9;border-radius:8px;padding:10px;margin-bottom:12px;">
+<strong>✅ Paciente: </strong><span id="rec_nombre_seleccionado"></span>
+<button class="btn btn-secondary" onclick="recLimpiarPaciente()" style="margin-left:8px;padding:2px 8px;font-size:12px;">✕</button>
+</div>
+</div>
+
+<!-- Datos paciente nuevo -->
+<div id="rec_form_nuevo" style="display:none;">
+<div class="form-grid" style="grid-template-columns:1fr 1fr;">
+<div class="form-group">
+<label>Nombre Completo *</label>
+<input type="text" id="rec_nuevo_nombre" placeholder="Nombre completo">
+</div>
+<div class="form-group">
+<label>Teléfono *</label>
+<input type="text" id="rec_nuevo_telefono" placeholder="10 dígitos">
+</div>
+<div class="form-group">
+<label>Fecha Nacimiento</label>
+<input type="date" id="rec_nuevo_nacimiento">
+</div>
+<div class="form-group">
+<label>Motivo Consulta</label>
+<input type="text" id="rec_nuevo_motivo" placeholder="Motivo de consulta">
+</div>
+</div>
+</div>
+
+<!-- Datos de la cita (aplica para ambos) -->
+<div id="rec_datos_cita" style="margin-top:12px;">
+<div class="form-grid" style="grid-template-columns:1fr 1fr;">
+<div class="form-group">
+<label>Fecha *</label>
+<input type="date" id="rec_cita_fecha" onchange="recCargarHorasDisponibles()">
+</div>
+<div class="form-group">
+<label>Hora *</label>
+<select id="rec_cita_hora">
+<option value="">Selecciona fecha primero</option>
+</select>
+</div>
+<div class="form-group">
+<label>Psicólogo</label>
+<select id="rec_cita_psicologo"></select>
+</div>
+<div class="form-group">
+<label>Consultorio</label>
+<select id="rec_cita_sala">
+<option value="Consultorio 1">Consultorio 1</option>
+<option value="Consultorio 2">Consultorio 2</option>
+<option value="Consultorio 3">Consultorio 3</option>
+<option value="Consultorio 4">Consultorio 4</option>
+<option value="Consultorio 5">Consultorio 5</option>
+<option value="Consultorio 6">Consultorio 6</option>
+<option value="Consultorio 7">Consultorio 7</option>
+</select>
+</div>
+<div class="form-group">
+<label>Modalidad</label>
+<select id="rec_cita_modalidad">
+<option value="Presencial">Presencial</option>
+<option value="En línea">En línea</option>
+</select>
+</div>
+<div class="form-group">
+<label>Motivo</label>
+<input type="text" id="rec_cita_motivo" placeholder="Motivo de la cita">
+</div>
+</div>
+<button class="btn btn-primary" onclick="recAgendarCita()" style="width:100%;margin-top:8px;">📅 Confirmar Cita</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
 <!-- ===== REPORTES ===== -->
 <section id="view-reportes" class="view">
 <div class="page-header">
@@ -3657,21 +3849,40 @@ if (debugInfo) debugInfo.textContent = 'App mostrada - User: ' + (currentUser ||
 if (userName) userName.textContent = currentUser || 'Usuario';
 if (userRole) userRole.textContent = currentRole === 'psicologo' ? 'Psicólogo' : 'Recepción';
 console.log('Usuario:', currentUser, 'Rol:', currentRole);
-// Configurar permisos
+// Configurar permisos por rol
 if (currentRole === 'recepcion') {
-var menuAnalisis = document.getElementById('menuAnalisis');
-var menuHistorialClinico = document.getElementById('menuHistorialClinico');
-var btnHistorial = document.getElementById('btnHistorialPaciente');
-if (menuAnalisis) menuAnalisis.style.display = 'none';
-if (menuHistorialClinico) menuHistorialClinico.style.display = 'none';
-if (btnHistorial) btnHistorial.style.display = 'none';
+  // Ocultar TODO el menú sidebar normal
+  document.querySelectorAll('.nav-section').forEach(function(s) { s.style.display = 'none'; });
+  // Agregar botón único de recepción al sidebar
+  var sidebar = document.getElementById('sidebar');
+  if (sidebar) {
+    var recNav = document.createElement('div');
+    recNav.className = 'nav-section';
+    recNav.innerHTML = '<div class="nav-section-title">Recepción</div>' +
+      '<button class="nav-btn active" onclick="goToView(&quot;recepcion&quot;)"><span class="icon">📋</span> Panel Recepción</button>';
+    sidebar.appendChild(recNav);
+  }
+  // Ocultar menú móvil y reemplazar
+  var mobilePanel = document.getElementById('mobile-menu-panel');
+  if (mobilePanel) {
+    mobilePanel.querySelectorAll('.nav-btn').forEach(function(b) { b.style.display = 'none'; });
+    var recBtn = document.createElement('button');
+    recBtn.className = 'nav-btn';
+    recBtn.innerHTML = '<span class="icon">📋</span> Panel Recepción';
+    recBtn.onclick = function() { goToView('recepcion'); closeMobileMenu(); };
+    mobilePanel.appendChild(recBtn);
+  }
+  // Ir directo al panel de recepción
+  goToView('recepcion');
+  setTimeout(function() { cargarRecepcionHoy(); }, 300);
+} else {
+  // Psicólogo — cargar datos normales
+  setTimeout(function() {
+    try { loadDashboard(); } catch(e) { console.log('Error cargando dashboard:', e); }
+    try { cargarPacientesParaAgendar(); } catch(e) {}
+    try { cargarPsicologos(); } catch(e) {}
+  }, 100);
 }
-// Cargar datos iniciales (con manejo de errores)
-setTimeout(function() {
-try { loadDashboard(); } catch(e) { console.log('Error cargando dashboard:', e); }
-try { cargarPacientesParaAgendar(); } catch(e) { console.log('Error cargando pacientes:', e); }
-try { cargarPsicologos(); } catch(e) { console.log('Error cargando psicólogos:', e); }
-}, 100);
 showToast('Bienvenido ' + (currentUser || ''), 'success');
 console.log('showApp() completado exitosamente');
 // Ocultar debug info después de 5 segundos
@@ -6284,6 +6495,382 @@ function verReportes() { goToView('reportes'); }
 function verFinanzas() { goToView('finanzas'); }
 function verEspaciosLibres() { goToView('espacios'); }
 function confirmarCitas() { goToView('confirmar'); }
+
+// ============================================================
+// ==================== RECEPCIÓN =============================
+// ============================================================
+
+var recPacienteId   = '';
+var recPacienteNombre = '';
+var recPacienteTel  = '';
+var recTipoPaciente = 'actual';
+
+function showRecTab(tabId) {
+  document.querySelectorAll('.rec-tab-content').forEach(function(t) { t.style.display = 'none'; t.classList.remove('active'); });
+  document.querySelectorAll('#view-recepcion .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  var tab = document.getElementById(tabId);
+  if (tab) { tab.style.display = 'block'; tab.classList.add('active'); }
+  event.target.classList.add('active');
+
+  if (tabId === 'rec-tab-hoy')      cargarRecepcionHoy();
+  if (tabId === 'rec-tab-semana')   cargarRecepcionSemana();
+  if (tabId === 'rec-tab-espacios') cargarRecepcionEspacios();
+  if (tabId === 'rec-tab-agendar')  recInicializarAgendar();
+}
+
+function cargarRecepcionHoy() {
+  var hoy = new Date().toISOString().split('T')[0];
+  var fechaEl = document.getElementById('rec_fecha_hoy');
+  if (fechaEl) fechaEl.textContent = new Date().toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  var loading = document.getElementById('rec_hoy_loading');
+  var tabla   = document.getElementById('rec_hoy_tabla');
+  var empty   = document.getElementById('rec_hoy_empty');
+  if (loading) loading.style.display = 'block';
+  if (tabla)   tabla.style.display   = 'none';
+  if (empty)   empty.style.display   = 'none';
+
+  gasCall('listAppointmentsByDate', [currentToken, hoy],
+  function(res) {
+    if (loading) loading.style.display = 'none';
+    var citas = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+    citas.sort(function(a,b) { return (a.HoraInicio||'').localeCompare(b.HoraInicio||''); });
+
+    if (citas.length === 0) {
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+
+    var tbody = document.getElementById('rec_hoy_body');
+    tbody.innerHTML = citas.map(function(c) {
+      var estatus  = (c.EstatusCita || 'PROGRAMADA').toUpperCase();
+      var badge    = '<span class="status-badge ' + estatus.toLowerCase() + '">' + estatus + '</span>';
+      var tel      = (c.TelefonoPaciente || c.Telefono || '').replace(/\D/g,'');
+      var nombre   = sanitize(c.NombrePaciente || '--');
+      var fecha    = c.Fecha || hoy;
+      var hora     = c.HoraInicio || '';
+      var msg      = encodeURIComponent('Hola ' + (c.NombrePaciente||'') + ', le recordamos su cita en el Centro Psicológico Aquí y Ahora el ' + fecha + ' a las ' + hora + '. Por favor confirme su asistencia.');
+      var waBtn    = tel ? '<button class="wa-btn" onclick="window.open(\'https://wa.me/52' + tel + '?text=' + msg + '\',\'_blank\')">📱 WA</button>' : '<span style="color:#94a3b8;font-size:11px;">Sin tel</span>';
+      var rowClass = estatus === 'REALIZADA' ? 'rec-hoy-row-realizada' : estatus === 'CANCELADA' ? 'rec-hoy-row-cancelada' : '';
+      var confBtn  = estatus === 'PROGRAMADA'
+        ? '<button class="table-btn" onclick="recConfirmarCita(\'' + sanitizeAttr(c.CitaID) + '\', this)">✓ Confirmar</button>'
+        : '';
+      return '<tr class="' + rowClass + '"><td>' + hora + '</td><td>' + nombre + '</td><td>' + sanitize(c.NombrePsicologo || c.Psicologo || '--') + '</td><td>' + badge + '</td><td>' + waBtn + '</td><td>' + confBtn + '</td></tr>';
+    }).join('');
+
+    if (tabla) tabla.style.display = 'table';
+  },
+  function(err) {
+    if (loading) loading.style.display = 'none';
+    showToast('Error cargando citas de hoy', 'error');
+  });
+}
+
+function recConfirmarCita(citaId, btn) {
+  if (!citaId) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+  gasCall('actualizarConfirmacion', [currentToken, citaId, 'CONFIRMADA'],
+  function(res) {
+    if (res && res.ok) {
+      showToast('Cita confirmada', 'success');
+      cargarRecepcionHoy();
+    } else {
+      btn.disabled = false;
+      btn.textContent = '✓ Confirmar';
+      showToast('Error al confirmar', 'error');
+    }
+  },
+  function(err) {
+    btn.disabled = false;
+    btn.textContent = '✓ Confirmar';
+    showToast('Error de conexión', 'error');
+  });
+}
+
+function cargarRecepcionSemana() {
+  var fechaInput = document.getElementById('rec_semana_fecha');
+  if (!fechaInput || !fechaInput.value) {
+    fechaInput.value = new Date().toISOString().split('T')[0];
+  }
+  var fechaBase = fechaInput.value;
+  var container = document.getElementById('rec_semana_container');
+  container.innerHTML = '<p class="empty-state">Cargando semana...</p>';
+
+  // Calcular lunes
+  var fecha     = new Date(fechaBase + 'T12:00:00');
+  var diaSemana = fecha.getDay();
+  var diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana;
+  var lunes     = new Date(fecha);
+  lunes.setDate(fecha.getDate() + diffLunes);
+
+  var dias = [];
+  var nombres = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  for (var d = 0; d < 7; d++) {
+    var dia = new Date(lunes);
+    dia.setDate(lunes.getDate() + d);
+    dias.push({ fecha: dia.toISOString().split('T')[0], nombre: nombres[d], num: dia.getDate() });
+  }
+
+  // Construir tabla
+  var html = '<table class="rec-semana-table"><thead><tr><th>Hora</th>';
+  dias.forEach(function(d) { html += '<th>' + d.nombre + '<br><small>' + d.num + '</small></th>'; });
+  html += '</tr></thead><tbody>';
+
+  for (var h = 9; h < 18; h++) {
+    var hora = String(h).padStart(2,'0') + ':00';
+    html += '<tr><td class="rec-hora-label">' + hora + '</td>';
+    dias.forEach(function(d) {
+      html += '<td id="rec_sem_' + d.fecha + '_' + h + '"><span style="color:#94a3b8;font-size:10px;">...</span></td>';
+    });
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  container.innerHTML = html;
+
+  // Cargar datos de cada día
+  dias.forEach(function(d) {
+    gasCall('getEspaciosLibresCompleto', [currentToken, d.fecha, 60],
+    function(res) {
+      if (!res || !res.ok) return;
+      var ocupados    = res.ocupados || [];
+      var disponibles = res.disponibles || [];
+      for (var h = 9; h < 18; h++) {
+        var hora   = String(h).padStart(2,'0') + ':00';
+        var cell   = document.getElementById('rec_sem_' + d.fecha + '_' + h);
+        if (!cell) continue;
+        var ocupado = ocupados.find(function(o) { return o.inicio === hora; });
+        if (ocupado) {
+          var nombreCorto = (ocupado.paciente || '').split(' ').slice(0,2).join(' ');
+          cell.innerHTML = '<div class="rec-semana-slot-ocupado" title="' + sanitize(ocupado.paciente) + '">' + sanitize(nombreCorto) + '</div>';
+        } else if (disponibles.indexOf(hora) >= 0) {
+          cell.innerHTML = '<div class="rec-semana-slot-libre" onclick="recAgendarDesde(\'' + d.fecha + '\',\'' + hora + '\')">Libre</div>';
+        } else {
+          cell.innerHTML = '<span style="color:#cbd5e1;font-size:10px;">—</span>';
+        }
+      }
+    }, function() {});
+  });
+}
+
+function recSemanaAnterior() {
+  var inp = document.getElementById('rec_semana_fecha');
+  var d   = new Date((inp.value || new Date().toISOString().split('T')[0]) + 'T12:00:00');
+  d.setDate(d.getDate() - 7);
+  inp.value = d.toISOString().split('T')[0];
+  cargarRecepcionSemana();
+}
+function recSemanaHoy() {
+  document.getElementById('rec_semana_fecha').value = new Date().toISOString().split('T')[0];
+  cargarRecepcionSemana();
+}
+function recSemanaSiguiente() {
+  var inp = document.getElementById('rec_semana_fecha');
+  var d   = new Date((inp.value || new Date().toISOString().split('T')[0]) + 'T12:00:00');
+  d.setDate(d.getDate() + 7);
+  inp.value = d.toISOString().split('T')[0];
+  cargarRecepcionSemana();
+}
+
+function cargarRecepcionEspacios() {
+  var fechaInput = document.getElementById('rec_espacios_fecha');
+  var vistaInput = document.getElementById('rec_espacios_vista');
+  if (!fechaInput.value) fechaInput.value = new Date().toISOString().split('T')[0];
+  var fecha  = fechaInput.value;
+  var vista  = vistaInput ? vistaInput.value : 'dia';
+  var cont   = document.getElementById('rec_espacios_container');
+  cont.innerHTML = '<p class="empty-state">Cargando espacios...</p>';
+
+  if (vista === 'dia') {
+    gasCall('getEspaciosLibresCompleto', [currentToken, fecha, 60],
+    function(res) {
+      if (!res || !res.ok) { cont.innerHTML = '<p class="empty-state">Error cargando espacios</p>'; return; }
+      var disponibles = res.disponibles || [];
+      var ocupados    = res.ocupados || [];
+      var html = '<table class="data-table"><thead><tr><th>Hora</th><th>Estado</th><th>Paciente</th><th>Acción</th></tr></thead><tbody>';
+      for (var h = 9; h < 18; h++) {
+        var hora    = String(h).padStart(2,'0') + ':00';
+        var ocupado = ocupados.find(function(o) { return o.inicio === hora; });
+        if (ocupado) {
+          html += '<tr><td>' + hora + '</td><td><span class="status-badge programada">Ocupado</span></td><td>' + sanitize(ocupado.paciente) + '</td><td></td></tr>';
+        } else if (disponibles.indexOf(hora) >= 0) {
+          html += '<tr><td>' + hora + '</td><td><span class="status-badge activo">Libre</span></td><td>—</td><td><button class="table-btn" onclick="recAgendarDesde(\'' + fecha + '\',\'' + hora + '\')">📅 Agendar</button></td></tr>';
+        } else {
+          html += '<tr><td>' + hora + '</td><td><span style="color:#94a3b8;font-size:11px;">No disponible</span></td><td></td><td></td></tr>';
+        }
+      }
+      html += '</tbody></table>';
+      cont.innerHTML = html;
+    }, function() { cont.innerHTML = '<p class="empty-state">Error de conexión</p>'; });
+  } else {
+    // Vista semana — reusar la lógica de semana
+    document.getElementById('rec_semana_fecha').value = fecha;
+    cont.innerHTML = '<p class="empty-state">Ver pestaña "Esta Semana" para vista semanal</p>';
+    showRecTab('rec-tab-semana');
+  }
+}
+
+function recInicializarAgendar() {
+  // Cargar psicólogos
+  gasCall('getPsicologos', [currentToken],
+  function(res) {
+    var psics = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+    var sel = document.getElementById('rec_cita_psicologo');
+    if (sel) {
+      sel.innerHTML = '<option value="">Sin asignar</option>' +
+        psics.map(function(p) { return '<option value="' + sanitize(p.Nombre||p.NombreCompleto||'') + '">' + sanitize(p.Nombre||p.NombreCompleto||'') + '</option>'; }).join('');
+    }
+  }, function() {});
+  // Fecha por defecto
+  var fechaInp = document.getElementById('rec_cita_fecha');
+  if (fechaInp && !fechaInp.value) fechaInp.value = new Date().toISOString().split('T')[0];
+}
+
+function recMostrarTipoPaciente(tipo) {
+  recTipoPaciente = tipo;
+  document.getElementById('rec_form_actual').style.display = tipo === 'actual' ? 'block' : 'none';
+  document.getElementById('rec_form_nuevo').style.display  = tipo === 'nuevo'  ? 'block' : 'none';
+  document.getElementById('rec_btn_actual').className = tipo === 'actual' ? 'btn btn-primary' : 'btn btn-secondary';
+  document.getElementById('rec_btn_nuevo').className  = tipo === 'nuevo'  ? 'btn btn-primary' : 'btn btn-secondary';
+  recPacienteId = ''; recPacienteNombre = ''; recPacienteTel = '';
+}
+
+function recBuscarPaciente() {
+  var q = document.getElementById('rec_buscar_input').value.trim();
+  if (!q) { showToast('Escribe un nombre o ID', 'warning'); return; }
+  var res_div = document.getElementById('rec_buscar_resultados');
+  res_div.innerHTML = '<p class="empty-state">Buscando...</p>';
+  gasCall('searchPatients', [currentToken, q],
+  function(res) {
+    var pats = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+    if (pats.length === 0) { res_div.innerHTML = '<p class="empty-state">Sin resultados</p>'; return; }
+    res_div.innerHTML = pats.slice(0,5).map(function(p) {
+      return '<div style="padding:8px;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:6px;cursor:pointer;background:#f8fafc;" onclick="recSeleccionarPaciente(\'' + sanitizeAttr(p.PatientID) + '\',\'' + sanitizeAttr(p.NombreCompleto) + '\',\'' + sanitizeAttr(p.Telefono||'') + '\')">' +
+        '<strong>' + sanitize(p.NombreCompleto) + '</strong> <span style="color:#64748b;font-size:12px;">' + sanitize(p.PatientID) + '</span>' +
+        (p.Telefono ? ' · 📱 ' + sanitize(p.Telefono) : '') + '</div>';
+    }).join('');
+  }, function() { res_div.innerHTML = '<p class="empty-state">Error de búsqueda</p>'; });
+}
+
+function recSeleccionarPaciente(id, nombre, tel) {
+  recPacienteId = id; recPacienteNombre = nombre; recPacienteTel = tel;
+  document.getElementById('rec_buscar_resultados').innerHTML = '';
+  document.getElementById('rec_nombre_seleccionado').textContent = nombre;
+  document.getElementById('rec_paciente_seleccionado').style.display = 'block';
+}
+
+function recLimpiarPaciente() {
+  recPacienteId = ''; recPacienteNombre = ''; recPacienteTel = '';
+  document.getElementById('rec_paciente_seleccionado').style.display = 'none';
+  document.getElementById('rec_buscar_input').value = '';
+  document.getElementById('rec_buscar_resultados').innerHTML = '';
+}
+
+function recCargarHorasDisponibles() {
+  var fecha = document.getElementById('rec_cita_fecha').value;
+  var sel   = document.getElementById('rec_cita_hora');
+  if (!fecha) return;
+  sel.innerHTML = '<option value="">Cargando...</option>';
+  gasCall('getEspaciosLibres', [currentToken, fecha, 60],
+  function(res) {
+    var horas = Array.isArray(res) ? res : (res && res.data ? res.data : []);
+    if (horas.length === 0) {
+      sel.innerHTML = '<option value="">Sin espacios disponibles</option>';
+    } else {
+      sel.innerHTML = '<option value="">Selecciona hora</option>' +
+        horas.map(function(h) { return '<option value="' + h + '">' + h + '</option>'; }).join('');
+    }
+  }, function() {
+    sel.innerHTML = '<option value="">Error cargando horas</option>';
+  });
+}
+
+function recAgendarDesde(fecha, hora) {
+  // Ir a tab agendar con fecha y hora prellenadas
+  showRecTab('rec-tab-agendar');
+  setTimeout(function() {
+    var fechaInp = document.getElementById('rec_cita_fecha');
+    if (fechaInp) { fechaInp.value = fecha; recCargarHorasDisponibles(); }
+    setTimeout(function() {
+      var horaInp = document.getElementById('rec_cita_hora');
+      if (horaInp) horaInp.value = hora;
+    }, 800);
+  }, 100);
+}
+
+function recAgendarCita() {
+  var fecha     = document.getElementById('rec_cita_fecha').value;
+  var hora      = document.getElementById('rec_cita_hora').value;
+  var psicologo = document.getElementById('rec_cita_psicologo').value;
+  var sala      = document.getElementById('rec_cita_sala').value;
+  var modalidad = document.getElementById('rec_cita_modalidad').value;
+  var motivo    = document.getElementById('rec_cita_motivo').value;
+
+  if (!fecha || !hora) { showToast('Selecciona fecha y hora', 'warning'); return; }
+
+  var patientId     = '';
+  var nombrePaciente = '';
+  var telefono      = '';
+
+  if (recTipoPaciente === 'actual') {
+    if (!recPacienteId) { showToast('Selecciona un paciente', 'warning'); return; }
+    patientId      = recPacienteId;
+    nombrePaciente = recPacienteNombre;
+    telefono       = recPacienteTel;
+    agendarCitaRecepcion(patientId, nombrePaciente, telefono, fecha, hora, psicologo, sala, modalidad, motivo);
+  } else {
+    // Paciente nuevo — primero crear el paciente
+    var nombre = document.getElementById('rec_nuevo_nombre').value.trim();
+    var tel    = document.getElementById('rec_nuevo_telefono').value.trim();
+    if (!nombre || !tel) { showToast('Nombre y teléfono son obligatorios', 'warning'); return; }
+    var nacimiento = document.getElementById('rec_nuevo_nacimiento').value;
+    var motivoPac  = document.getElementById('rec_nuevo_motivo').value;
+    var nuevoPaciente = {
+      NombreCompleto: nombre, Telefono: tel,
+      FechaNacimiento: nacimiento, MotivoConsulta: motivoPac,
+      EstatusPaciente: 'ACTIVO', Servicio: 'Consulta Individual'
+    };
+    showToast('Registrando paciente...', 'info');
+    gasCall('addPatient', [currentToken, nuevoPaciente],
+    function(res) {
+      if (res && res.ok) {
+        agendarCitaRecepcion(res.patientId || '', nombre, tel, fecha, hora, psicologo, sala, modalidad, motivo || motivoPac);
+      } else {
+        showToast('Error registrando paciente: ' + (res && res.error ? res.error : ''), 'error');
+      }
+    }, function() { showToast('Error de conexión', 'error'); });
+  }
+}
+
+function agendarCitaRecepcion(patientId, nombre, telefono, fecha, hora, psicologo, sala, modalidad, motivo) {
+  var horaFin = String(parseInt(hora.split(':')[0]) + 1).padStart(2,'0') + ':00';
+  var payload = {
+    PatientID: patientId, NombrePaciente: nombre,
+    Fecha: fecha, HoraInicio: hora, HoraFin: horaFin,
+    DuracionMinutos: 60, EstatusCita: 'PROGRAMADA',
+    NombrePsicologo: psicologo, Sala: sala,
+    Modalidad: modalidad, Motivo: motivo
+  };
+  showToast('Agendando cita...', 'info');
+  gasCall('addAppointment', [currentToken, payload],
+  function(res) {
+    if (res && res.ok) {
+      showToast('✅ Cita agendada correctamente', 'success');
+      // Limpiar formulario
+      recLimpiarPaciente();
+      document.getElementById('rec_cita_fecha').value = '';
+      document.getElementById('rec_cita_hora').innerHTML = '<option value="">Selecciona fecha primero</option>';
+      document.getElementById('rec_cita_motivo').value = '';
+      // Si fue paciente nuevo, limpiar campos
+      document.getElementById('rec_nuevo_nombre').value = '';
+      document.getElementById('rec_nuevo_telefono').value = '';
+      // Ir a citas de hoy
+      showRecTab('rec-tab-hoy');
+    } else {
+      showToast('Error: ' + (res && res.error ? res.error : 'No se pudo agendar'), 'error');
+    }
+  }, function() { showToast('Error de conexión', 'error'); });
+}
 </script>
 </body>
 </html>
