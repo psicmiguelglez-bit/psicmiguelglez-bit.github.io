@@ -1348,8 +1348,8 @@ margin-top: 40px;
 .tab-btn { font-size: 11px; padding: 6px 10px; flex: 1 1 auto; text-align: center; }
 .toast { min-width: unset; width: calc(100vw - 32px); right: 16px; bottom: 16px; }
 /* Sidebar colapsado por defecto en móvil */
-.layout { grid-template-columns: 48px 1fr; }
-.sidebar { padding: 16px 8px; overflow: hidden; }
+.layout { grid-template-columns: 72px 1fr; }
+.sidebar { padding: 16px 4px; overflow: hidden; }
 .nav-section-title { display: none; }
 .nav-btn span:last-child { display: none; }
 .nav-btn { justify-content: center; padding: 10px 0; }
@@ -1367,20 +1367,31 @@ margin-top: 40px;
 /* ===== MÓVIL: sidebar colapsado automático + touch ===== */
 @media (max-width: 640px) {
 /* Sidebar siempre colapsado en móvil (solo iconos) */
-.layout { grid-template-columns: 48px 1fr !important; }
+.layout { grid-template-columns: 72px 1fr !important; }
 .sidebar {
-padding: 12px 6px !important;
+padding: 12px 4px !important;
 overflow: hidden !important;
 }
 .nav-section-title { display: none !important; }
 .nav-btn { 
 justify-content: center !important; 
-padding: 12px 4px !important;
-font-size: 20px !important;
+padding: 10px 4px !important;
+font-size: 11px !important;
 border-radius: 8px;
+flex-direction: column;
+gap: 2px;
 }
-.nav-btn span:last-child { display: none !important; }
-.nav-btn .nav-icon { margin: 0 !important; font-size: 22px !important; }
+.nav-btn span:last-child { 
+display: block !important;
+font-size: 9px !important;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+max-width: 64px;
+line-height: 1.1;
+}
+.nav-btn .icon { font-size: 18px !important; }
+.nav-btn .nav-icon { margin: 0 !important; font-size: 20px !important; }
 /* Agrandar áreas táctiles */
 .btn { min-height: 44px; }
 .table-btn { min-height: 36px; padding: 6px 10px !important; font-size: 12px !important; }
@@ -3656,11 +3667,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Aplicar estilos móvil directamente (no depender de media query)
     var style = document.createElement('style');
     style.textContent = [
-      '.layout { grid-template-columns: 48px 1fr !important; }',
-      '.sidebar { padding: 12px 6px !important; overflow: hidden !important; }',
+      '.layout { grid-template-columns: 72px 1fr !important; }',
+      '.sidebar { padding: 12px 4px !important; overflow: hidden !important; }',
       '.nav-section-title { display: none !important; }',
-      '.nav-btn { justify-content: center !important; padding: 12px 4px !important; }',
-      '.nav-btn span:last-child { display: none !important; }',
+      '.nav-btn { justify-content: center !important; padding: 8px 4px !important; flex-direction: column !important; gap: 2px !important; font-size: 11px !important; }',
+      '.nav-btn span:last-child { display: block !important; font-size: 9px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; max-width: 64px !important; line-height: 1.1 !important; }',
+      '.nav-btn .icon { font-size: 18px !important; }',
       '.main-content { padding: 10px 8px !important; }',
       '.header-brand p { display: none !important; }',
       '.header-right .user-info span:last-child { display: none !important; }',
@@ -3813,7 +3825,7 @@ if (currentRole === 'recepcion') {
     var recNav = document.createElement('div');
     recNav.className = 'nav-section';
     recNav.innerHTML = '<div class="nav-section-title">Recepción</div>' +
-      '<button class="nav-btn active" onclick="goToView(&quot;recepcion&quot;)"><span class="icon">🏥</span> Panel Recepción</button>';
+      '<button class="nav-btn active" onclick="goToView(&quot;recepcion&quot;)"><span class="icon">🏥</span><span>Recepción</span></button>';
     sidebar.appendChild(recNav);
   }
   // Reemplazar menú móvil
