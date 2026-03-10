@@ -278,7 +278,8 @@ background: var(--accent-bg);
 color: var(--accent);
 font-weight: 600;
 }
-.nav-btn .icon { font-size: 18px; width: 24px; text-align: center; }
+.nav-btn .icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.nav-label { /* visible on desktop, reformatted on mobile */ }
 /* ===== MAIN CONTENT ===== */
 .main-content { padding: 24px; overflow-y: auto; }
 .view { display: none; }
@@ -1347,12 +1348,13 @@ margin-top: 40px;
 .tabs-container { flex-wrap: wrap; gap: 4px; }
 .tab-btn { font-size: 11px; padding: 6px 10px; flex: 1 1 auto; text-align: center; }
 .toast { min-width: unset; width: calc(100vw - 32px); right: 16px; bottom: 16px; }
-/* Sidebar colapsado por defecto en móvil */
-.layout { grid-template-columns: 72px 1fr; }
-.sidebar { padding: 16px 4px; overflow: hidden; }
-.nav-section-title { display: none; }
-.nav-btn span:last-child { display: none; }
-.nav-btn { justify-content: center; padding: 10px 0; }
+/* Sidebar visible en móvil con icono + texto */
+.layout { grid-template-columns: 120px 1fr; }
+.sidebar { padding: 8px 4px; overflow-y: auto; overflow-x: hidden; }
+.nav-section-title { font-size: 9px !important; padding: 4px 6px 2px !important; }
+.nav-btn { justify-content: flex-start; padding: 7px 6px; gap: 5px; white-space: nowrap; overflow: hidden; }
+.nav-btn .icon { font-size: 15px; flex-shrink: 0; }
+.nav-label { font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
 }
 
 @media (max-width: 480px) {
@@ -1364,34 +1366,33 @@ margin-top: 40px;
 .page-header h2 { font-size: 20px; }
 }
 
-/* ===== MÓVIL: sidebar colapsado automático + touch ===== */
+/* ===== MÓVIL: sidebar con texto visible ===== */
 @media (max-width: 640px) {
-/* Sidebar siempre colapsado en móvil (solo iconos) */
-.layout { grid-template-columns: 72px 1fr !important; }
+/* Sidebar con texto en móvil */
+.layout { grid-template-columns: 120px 1fr !important; }
 .sidebar {
-padding: 12px 4px !important;
-overflow: hidden !important;
+padding: 8px 4px !important;
+overflow-y: auto !important;
+overflow-x: hidden !important;
 }
-.nav-section-title { display: none !important; }
+.nav-section-title { font-size: 9px !important; padding: 4px 6px 2px !important; display: block !important; }
 .nav-btn { 
-justify-content: center !important; 
-padding: 10px 4px !important;
+justify-content: flex-start !important; 
+padding: 7px 6px !important;
 font-size: 11px !important;
-border-radius: 8px;
-flex-direction: column;
-gap: 2px;
+border-radius: 6px !important;
+flex-direction: row !important;
+gap: 5px !important;
 }
 .nav-btn span:last-child { 
 display: block !important;
-font-size: 9px !important;
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
-max-width: 64px;
-line-height: 1.1;
+font-size: 11px !important;
+white-space: nowrap !important;
+overflow: hidden !important;
+text-overflow: ellipsis !important;
 }
-.nav-btn .icon { font-size: 18px !important; }
-.nav-btn .nav-icon { margin: 0 !important; font-size: 20px !important; }
+.nav-btn .icon { font-size: 14px !important; flex-shrink: 0 !important; }
+.nav-btn .nav-icon { margin: 0 !important; font-size: 14px !important; flex-shrink: 0 !important; }
 /* Agrandar áreas táctiles */
 .btn { min-height: 44px; }
 .table-btn { min-height: 36px; padding: 6px 10px !important; font-size: 12px !important; }
@@ -1605,46 +1606,46 @@ function gasCall(fn, args, ok, fail) {
 <div class="nav-section">
 <div class="nav-section-title">Principal</div>
 <button class="nav-btn active" data-view="dashboard" title="Dashboard" onclick="goToView('dashboard')">
-<span class="icon">📊</span> Dashboard
+<span class="icon">📊</span><span class="nav-label">Dashboard</span>
 </button>
 <button class="nav-btn" data-view="agenda" title="Agenda" onclick="goToView('agenda')">
-<span class="icon">📅</span> Agenda
+<span class="icon">📅</span><span class="nav-label">Agenda</span>
 </button>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">Pacientes</div>
 <button class="nav-btn" data-view="alta" title="Alta Paciente" onclick="goToView('alta')">
-<span class="icon">➕</span> Alta Paciente
+<span class="icon">➕</span><span class="nav-label">Alta</span>
 </button>
 <button class="nav-btn" data-view="buscar" title="Buscar Paciente" onclick="goToView('buscar')">
-<span class="icon">🔍</span> Buscar Paciente
+<span class="icon">🔍</span><span class="nav-label">Buscar</span>
 </button>
 <button class="nav-btn" id="btnHistorialPaciente" data-view="historial" title="Historial" onclick="goToView('historial')">
-<span class="icon">📋</span> Historial
+<span class="icon">📋</span><span class="nav-label">Historial</span>
 </button>
 </div>
 <div class="nav-section">
 <div class="nav-section-title">Gestión</div>
 <button class="nav-btn" data-view="estatus" title="Cambiar Estatus" onclick="goToView('estatus')">
-<span class="icon">⚙️</span> Cambiar Estatus
+<span class="icon">⚙️</span><span class="nav-label">Estatus</span>
 </button>
 <button class="nav-btn" data-view="espacios" title="Espacios Libres" onclick="goToView('espacios')">
-<span class="icon">🕐</span> Espacios Libres
+<span class="icon">🕐</span><span class="nav-label">Espacios</span>
 </button>
 </div>
 <div class="nav-section" id="menuAnalisis">
 <div class="nav-section-title">Análisis</div>
 <button class="nav-btn" data-view="reportes" title="Reportes" onclick="goToView('reportes')">
-<span class="icon">📈</span> Reportes
+<span class="icon">📈</span><span class="nav-label">Reportes</span>
 </button>
 <button class="nav-btn" data-view="finanzas" title="Finanzas" onclick="goToView('finanzas')">
-<span class="icon">💰</span> Finanzas
+<span class="icon">💰</span><span class="nav-label">Finanzas</span>
 </button>
 </div>
 <div class="nav-section" id="menuHistorialClinico">
 <div class="nav-section-title">Clínico</div>
 <button class="nav-btn" data-view="historial-clinico" title="Historial Clínico" onclick="goToView('historial-clinico')">
-<span class="icon">🏥</span> Historial Clínico
+<span class="icon">🏥</span><span class="nav-label">Clínico</span>
 </button>
 </div>
 </nav>
@@ -3667,12 +3668,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Aplicar estilos móvil directamente (no depender de media query)
     var style = document.createElement('style');
     style.textContent = [
-      '.layout { grid-template-columns: 72px 1fr !important; }',
-      '.sidebar { padding: 12px 4px !important; overflow: hidden !important; }',
-      '.nav-section-title { display: none !important; }',
-      '.nav-btn { justify-content: center !important; padding: 8px 4px !important; flex-direction: column !important; gap: 2px !important; font-size: 11px !important; }',
-      '.nav-btn span:last-child { display: block !important; font-size: 9px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; max-width: 64px !important; line-height: 1.1 !important; }',
-      '.nav-btn .icon { font-size: 18px !important; }',
+      '.layout { grid-template-columns: 120px 1fr !important; }',
+      '.sidebar { padding: 8px 4px !important; overflow-y: auto !important; overflow-x: hidden !important; }',
+      '.nav-section-title { font-size: 9px !important; padding: 4px 6px 2px !important; display: block !important; }',
+      '.nav-btn { justify-content: flex-start !important; padding: 7px 6px !important; flex-direction: row !important; gap: 6px !important; white-space: nowrap !important; overflow: hidden !important; }',
+      '.nav-btn .icon { font-size: 14px !important; flex-shrink: 0 !important; }',
+      '.nav-label { font-size: 11px !important; display: inline !important; overflow: hidden !important; text-overflow: ellipsis !important; }',
       '.main-content { padding: 10px 8px !important; }',
       '.header-brand p { display: none !important; }',
       '.header-right .user-info span:last-child { display: none !important; }',
@@ -3818,16 +3819,11 @@ if (userRole) userRole.textContent = currentRole === 'psicologo' ? 'Psicólogo' 
 console.log('Usuario:', currentUser, 'Rol:', currentRole);
 // Configurar permisos por rol
 if (currentRole === 'recepcion') {
-  // Ocultar todo el sidebar normal y reemplazar con botón recepción
-  document.querySelectorAll('.nav-section').forEach(function(s) { s.style.display = 'none'; });
+  // Ocultar sidebar completamente — recepción no lo necesita
   var sidebar = document.getElementById('sidebar');
-  if (sidebar) {
-    var recNav = document.createElement('div');
-    recNav.className = 'nav-section';
-    recNav.innerHTML = '<div class="nav-section-title">Recepción</div>' +
-      '<button class="nav-btn active" onclick="goToView(&quot;recepcion&quot;)"><span class="icon">🏥</span><span>Recepción</span></button>';
-    sidebar.appendChild(recNav);
-  }
+  if (sidebar) sidebar.style.display = 'none';
+  var layout = document.querySelector('.layout');
+  if (layout) layout.style.gridTemplateColumns = '0 1fr';
   // Reemplazar menú móvil
   var mobilePanel = document.getElementById('mobile-menu-panel');
   if (mobilePanel) {
