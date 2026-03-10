@@ -1366,6 +1366,30 @@ margin-top: 40px;
 .page-header h2 { font-size: 20px; }
 }
 
+/* ===== ROL RECEPCIÓN: sin sidebar ===== */
+body.rol-recepcion .layout {
+  display: block !important;
+  grid-template-columns: unset !important;
+}
+body.rol-recepcion .sidebar {
+  display: none !important;
+}
+body.rol-recepcion .main-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 12px !important;
+  box-sizing: border-box !important;
+}
+body.rol-recepcion .rec-screen {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+body.rol-recepcion .rec-cita-card {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
 /* ===== MÓVIL: sidebar con texto visible ===== */
 @media (max-width: 640px) {
 /* Sidebar con texto en móvil */
@@ -3869,14 +3893,8 @@ if (userRole) userRole.textContent = currentRole === 'psicologo' ? 'Psicólogo' 
 console.log('Usuario:', currentUser, 'Rol:', currentRole);
 // Configurar permisos por rol
 if (currentRole === 'recepcion') {
-  // Ocultar sidebar completamente — recepción no lo necesita
-  var sidebar = document.getElementById('sidebar');
-  if (sidebar) sidebar.style.display = 'none';
-  var layout = document.querySelector('.layout');
-  if (layout) {
-    layout.style.gridTemplateColumns = '0px 1fr';
-    layout.style.gap = '0';
-  }
+  // Clase CSS que anula todos los media queries del sidebar
+  document.body.classList.add('rol-recepcion');
   // Reemplazar menú móvil
   var mobilePanel = document.getElementById('mobile-menu-panel');
   if (mobilePanel) {
