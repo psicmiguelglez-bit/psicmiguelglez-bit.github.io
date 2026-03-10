@@ -1579,6 +1579,24 @@ function _gasCallJsonp(fn, payload, ok, fail) {
   };
   document.head.appendChild(script);
 }
+
+// Fecha local correcta (evita desfase UTC en México)
+function fechaHoy() {
+  var d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function fechaLocal(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function fechaManana() {
+  var d = new Date();
+  d.setDate(d.getDate()+1);
+  return fechaLocal(d);
+}
 </script>
 </head>
 <body>
@@ -3728,7 +3746,7 @@ document.addEventListener('DOMContentLoaded', function() {
 try {
 // Configurar fecha por defecto (con try-catch por si algún elemento no existe)
 try {
-var hoy = new Date().toISOString().split('T')[0];
+var hoy = fechaHoy();
 var wFalta = document.getElementById('w_falta');
 var aFecha = document.getElementById('a_fecha');
 var estatusFecha = document.getElementById('estatus_fecha');
@@ -3855,7 +3873,10 @@ if (currentRole === 'recepcion') {
   var sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.style.display = 'none';
   var layout = document.querySelector('.layout');
-  if (layout) layout.style.gridTemplateColumns = '0 1fr';
+  if (layout) {
+    layout.style.gridTemplateColumns = '0px 1fr';
+    layout.style.gap = '0';
+  }
   // Reemplazar menú móvil
   var mobilePanel = document.getElementById('mobile-menu-panel');
   if (mobilePanel) {
@@ -3959,7 +3980,7 @@ console.error('Error cargando dashboard:', err);
 });
 // Cargar citas de hoy
 try {
-var hoy = new Date().toISOString().split('T')[0];
+var hoy = fechaHoy();
 gasCall('listAppointmentsByDate', [currentToken, hoy, ''],
 function(citas) {
 renderCitasHoy(citas);
@@ -4029,7 +4050,7 @@ return '<tr>' +
 }).join('');
 }
 function filtrarCitasHoy(filtro) {
-var hoy = new Date().toISOString().split('T')[0];
+var hoy = fechaHoy();
 gasCall('listAppointmentsByDate', [currentToken, hoy, filtro === 'todos' ? '' : filtro],
 function(citas) {
 if (filtro !== 'todos') {
@@ -4556,7 +4577,7 @@ currentAgendaDate.setDate(currentAgendaDate.getDate() - 7);
 } else {
 currentAgendaDate.setMonth(currentAgendaDate.getMonth() - 1);
 }
-document.getElementById('agenda_fecha').value = currentAgendaDate.toISOString().split('T')[0];
+document.getElementById('agenda_fecha').value = fechaLocal(currentAgendaDate);
 cargarAgendaSemanal();
 }
 function agendaSiguiente() {
@@ -4567,12 +4588,12 @@ currentAgendaDate.setDate(currentAgendaDate.getDate() + 7);
 } else {
 currentAgendaDate.setMonth(currentAgendaDate.getMonth() + 1);
 }
-document.getElementById('agenda_fecha').value = currentAgendaDate.toISOString().split('T')[0];
+document.getElementById('agenda_fecha').value = fechaLocal(currentAgendaDate);
 cargarAgendaSemanal();
 }
 function agendaHoy() {
 currentAgendaDate = new Date();
-document.getElementById('agenda_fecha').value = currentAgendaDate.toISOString().split('T')[0];
+document.getElementById('agenda_fecha').value = fechaLocal(currentAgendaDate);
 cargarAgendaSemanal();
 }
 function cargarAgendaSemanal() {
@@ -4630,7 +4651,7 @@ html += '<div class="corner-cell"></div>';
 for (var d = 0; d < 7; d++) {
 var dia = new Date(lunes);
 dia.setDate(lunes.getDate() + d);
-var fechaStr = dia.toISOString().split('T')[0];
+var fechaStr = fechaLocal(dia);
 var diaNum = dia.getDate();
 html += '<div class="day-header"><span class="day-name">' + nombresDias[d] + '</span><span class="day-date">' + diaNum + '</span></div>';
 }
@@ -4640,7 +4661,7 @@ html += '<div class="hour-label">' + hora + '</div>';
 for (var d = 0; d < 7; d++) {
 var dia = new Date(lunes);
 dia.setDate(lunes.getDate() + d);
-var fechaStr = dia.toISOString().split('T')[0];
+var fechaStr = fechaLocal(dia);
 html += '<div class="week-slot loading" data-fecha="' + fechaStr + '" data-hora="' + hora + '">\...</div>';
 }
 }
@@ -4650,7 +4671,7 @@ container.innerHTML = html;
 for (var d = 0; d < 7; d++) {
 var dia = new Date(lunes);
 dia.setDate(lunes.getDate() + d);
-var fechaStr = dia.toISOString().split('T')[0];
+var fechaStr = fechaLocal(dia);
 cargarDatosDiaSemana(fechaStr);
 }
 }
@@ -4700,7 +4721,7 @@ html += '<div class="month-day other-month"></div>';
 // Días del mes
 for (var d = 1; d <= totalDias; d++) {
 var dia = new Date(anio, mes, d);
-var fechaStr = dia.toISOString().split('T')[0];
+var fechaStr = fechaLocal(dia);
 html += '<div class="month-day loading" data-fecha="' + fechaStr + '">' +
 '<div class="day-number">' + d + '</div>' +
 '<div class="free-slots">Cargando\...</div>' +
@@ -4711,7 +4732,7 @@ container.innerHTML = html;
 // Cargar datos para cada día
 for (var d = 1; d <= totalDias; d++) {
 var dia = new Date(anio, mes, d);
-var fechaStr = dia.toISOString().split('T')[0];
+var fechaStr = fechaLocal(dia);
 cargarDatosDiaMes(fechaStr);
 }
 }
@@ -5115,8 +5136,8 @@ var diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana;
 lunes.setDate(lunes.getDate() + diffLunes + (i * 7));
 var domingo = new Date(lunes);
 domingo.setDate(lunes.getDate() + 6);
-var lunesStr = lunes.toISOString().split('T')[0];
-var domingoStr = domingo.toISOString().split('T')[0];
+var lunesStr = fechaLocal(lunes);
+var domingoStr = fechaLocal(domingo);
 var label = 'Semana ' + lunesStr + ' al ' + domingoStr;
 html += '<option value="' + lunesStr + '|' + domingoStr + '">' + label + '</option>';
 }
@@ -5464,8 +5485,8 @@ return '<tr><td>' + sanitize(p.NombreCompleto||'--') + '</td><td>' + sanitize(p.
 // Para abandono: necesitamos citas del último período
 var hoy = new Date();
 var limiteFecha = new Date(hoy.getTime() - diasSinCita * 24 * 60 * 60 * 1000);
-var limiteFechaISO = limiteFecha.toISOString().split('T')[0];
-gasCall('listAppointmentsByRange',[currentToken, '2020-01-01', hoy.toISOString().split('T')[0], ''],
+var limiteFechaISO = fechaLocal(limiteFecha);
+gasCall('listAppointmentsByRange',[currentToken, '2020-01-01', fechaLocal(hoy), ''],
 function(citas) {
 citas = Array.isArray(citas) ? citas : [];
 // Última cita por paciente
@@ -5507,8 +5528,8 @@ function cargarFinanzas() {
 cargarResumenHoy();
 // Inicializar fechas de los filtros con el mes actual
 var hoy = new Date();
-var primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().split('T')[0];
-var hoyISO = hoy.toISOString().split('T')[0];
+var primerDia = fechaLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+var hoyISO = fechaLocal(hoy);
 ['fin_desde','oc_desde','ret_desde'].forEach(function(id) {
 var el = document.getElementById(id);
 if (el && !el.value) el.value = primerDia;
@@ -5735,7 +5756,7 @@ renderHCCitas(bundle.appts || []);
 // Renderizar adeudos
 renderHCAdeudos(adeudos);
 // Configurar fecha por defecto para nueva nota
-document.getElementById('hc_nota_fecha').value = new Date().toISOString().split('T')[0];
+document.getElementById('hc_nota_fecha').value = fechaHoy();
 document.getElementById('hc_nota_numero').value = (bundle.sessions || []).length + 1;
 },
 function(){});
@@ -6421,7 +6442,7 @@ function recIrA(sid) {
     'rec-semana':    recSemHoy,
     'rec-espacios':  function(){
       var f = document.getElementById('rec_esp_fecha');
-      if (f && !f.value) f.value = new Date().toISOString().split('T')[0];
+      if (f && !f.value) f.value = fechaHoy();
       cargarRecEspacios();
     },
     'rec-agendar':  recInitAgendar,
@@ -6431,8 +6452,8 @@ function recIrA(sid) {
 }
 
 function recDashboard() {
-  var hoy = new Date().toISOString().split('T')[0];
-  var man = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  var hoy = fechaHoy();
+  var man = fechaManana();
   var dl  = new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   var fh  = document.getElementById('rec_fecha_hoy');
   if (fh) fh.textContent = dl.charAt(0).toUpperCase()+dl.slice(1);
@@ -6516,7 +6537,7 @@ function _recRender(citas,fecha,showWA,showEst) {
 }
 
 function cargarRecHoy() {
-  var hoy = new Date().toISOString().split('T')[0];
+  var hoy = fechaHoy();
   _recLoad('rec_hoy_loading','rec_hoy_empty','rec_hoy_lista');
   _gsr('listAppointmentsByDate',[currentToken,hoy],function(r){
     var citas = _recLista(r);
@@ -6526,7 +6547,7 @@ function cargarRecHoy() {
 }
 
 function cargarRecEstatus() {
-  var hoy = new Date().toISOString().split('T')[0];
+  var hoy = fechaHoy();
   _recLoad('rec_est_loading','rec_est_empty','rec_est_lista');
   _gsr('listAppointmentsByDate',[currentToken,hoy],function(r){
     var citas = _recLista(r);
@@ -6546,7 +6567,7 @@ function _recEstBtn(btn) {
 }
 
 function cargarRecManana() {
-  var man   = new Date(Date.now()+86400000).toISOString().split('T')[0];
+  var man   = fechaManana();
   var label = new Date(man+'T12:00:00').toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
   _recLoad('rec_man_loading','rec_man_empty','rec_man_lista','Cargando pacientes de '+label+'...');
   _gsr('listAppointmentsByDate',[currentToken,man],function(r){
@@ -6571,7 +6592,7 @@ function cargarRecSemana() {
   var dias=[], abr=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   for (var d=0;d<7;d++){
     var dd=new Date(lun); dd.setDate(lun.getDate()+d);
-    dias.push({fecha:dd.toISOString().split('T')[0],abr:abr[d],num:dd.getDate()});
+    dias.push({fecha:fechaLocal(dd),abr:abr[d],num:dd.getDate()});
   }
 
   var ht='<table class="rec-sem-tabla"><thead><tr><th class="rec-sem-hora-th">Hora</th>';
@@ -6615,24 +6636,24 @@ function(){});
 
 function recSemAnterior(){
   var i=document.getElementById('rec_sem_fecha');
-  var d=new Date((i.value||new Date().toISOString().split('T')[0])+'T12:00:00');
-  d.setDate(d.getDate()-7); i.value=d.toISOString().split('T')[0]; cargarRecSemana();
+  var d=new Date((i.value||fechaHoy())+'T12:00:00');
+  d.setDate(d.getDate()-7); i.value=fechaLocal(d); cargarRecSemana();
 }
 function recSemHoy(){
   var i=document.getElementById('rec_sem_fecha');
-  if(i) i.value=new Date().toISOString().split('T')[0];
+  if(i) i.value=fechaHoy();
   cargarRecSemana();
 }
 function recSemSiguiente(){
   var i=document.getElementById('rec_sem_fecha');
-  var d=new Date((i.value||new Date().toISOString().split('T')[0])+'T12:00:00');
-  d.setDate(d.getDate()+7); i.value=d.toISOString().split('T')[0]; cargarRecSemana();
+  var d=new Date((i.value||fechaHoy())+'T12:00:00');
+  d.setDate(d.getDate()+7); i.value=fechaLocal(d); cargarRecSemana();
 }
 
 function cargarRecEspacios() {
   var fi=document.getElementById('rec_esp_fecha');
   var vi=document.getElementById('rec_esp_vista');
-  if (!fi.value) fi.value=new Date().toISOString().split('T')[0];
+  if (!fi.value) fi.value=fechaHoy();
   var fecha=fi.value, vista=vi?vi.value:'dia';
 
   if (vista==='semana'){
@@ -6693,7 +6714,7 @@ function(r){
     },
 function(){});
   var fd=document.getElementById('rec_cita_fecha');
-  if(fd&&!fd.value){ fd.value=new Date().toISOString().split('T')[0]; recCargarHoras(); }
+  if(fd&&!fd.value){ fd.value=fechaHoy(); recCargarHoras(); }
 }
 
 function recTipoPac(t){
