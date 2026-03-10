@@ -1,4 +1,4 @@
-const CACHE = 'centro-ps-v2';
+const CACHE = 'centro-ps-v3';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', function(e) {
@@ -17,9 +17,22 @@ self.addEventListener('activate', function(e) {
 
 self.addEventListener('fetch', function(e) {
   if (e.request.url.includes('script.google.com') || e.request.url.includes('googleapis.com')) return;
+  // Network first para el index.html, cache fallback
+  if (e.request.url.endsWith('/') || e.request.url.endsWith('/index.html')) {
+    e.respondWith(
+      fetch(e.request).then(function(r){
+        var clone = r.clone();
+        caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
+        return r;
+      }).catch(function(){
+        return caches.match(e.request);
+      })
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(function(cached){
-      return cached || fetch(e.request).catch(function(){ return cached; });
+      return cached || fetch(e.request);
     })
   );
 });
