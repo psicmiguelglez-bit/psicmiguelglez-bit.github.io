@@ -1508,12 +1508,49 @@ display: block;
 }
 </style>
 <script>
-// ── Conexión al backend Google Apps Script (JSONP — sin CORS) ──
+// ── Conexión al backend Google Apps Script ──
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbyAE_--4_BLwU3Tf85f4QuwLUrAzfO8dr4B1Mc0SS6mwxaJRuztNYDD1aRPHk0b3Uf_/exec';
 
 function gasCall(fn, args, ok, fail) {
-  var cbName = '_gcb_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
   var payload = JSON.stringify({ action: fn, args: args || [] });
+
+  // Intentar primero con fetch (funciona en la mayoría de casos)
+  _gasCallFetch(fn, payload, ok, function(fetchErr) {
+    // Si fetch falla, intentar JSONP como fallback
+    console.warn('fetch falló para ' + fn + ', intentando JSONP...', fetchErr);
+    _gasCallJsonp(fn, payload, ok, fail);
+  });
+}
+
+function _gasCallFetch(fn, payload, ok, fail) {
+  var url = GAS_URL + '?payload=' + encodeURIComponent(payload) + '&_t=' + Date.now();
+  var timer = setTimeout(function() {
+    fail(new Error('Timeout fetch'));
+  }, 20000);
+
+  fetch(url, { method: 'GET', redirect: 'follow' })
+    .then(function(r) {
+      clearTimeout(timer);
+      return r.text();
+    })
+    .then(function(text) {
+      try {
+        var clean = text.trim();
+        if (/^[\w$]+\(/.test(clean)) clean = clean.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
+        var data = JSON.parse(clean);
+        if (ok) ok(data);
+      } catch(e) {
+        fail(e);
+      }
+    })
+    .catch(function(e) {
+      clearTimeout(timer);
+      fail(e);
+    });
+}
+
+function _gasCallJsonp(fn, payload, ok, fail) {
+  var cbName = '_gcb_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
   var url = GAS_URL
     + '?payload=' + encodeURIComponent(payload)
     + '&callback=' + cbName
@@ -1521,29 +1558,24 @@ function gasCall(fn, args, ok, fail) {
 
   var timer = setTimeout(function() {
     cleanup();
-    console.error('gasCall timeout:', fn);
-    if (fail) fail(new Error('Timeout: ' + fn));
+    if (fail) fail(new Error('Error de red — verifica tu conexión'));
   }, 20000);
 
   function cleanup() {
     clearTimeout(timer);
     if (window[cbName]) delete window[cbName];
     var s = document.getElementById(cbName);
-    if (s) s.parentNode.removeChild(s);
+    if (s && s.parentNode) s.parentNode.removeChild(s);
   }
 
-  window[cbName] = function(data) {
-    cleanup();
-    if (ok) ok(data);
-  };
+  window[cbName] = function(data) { cleanup(); if (ok) ok(data); };
 
   var script = document.createElement('script');
   script.id  = cbName;
   script.src = url;
   script.onerror = function() {
     cleanup();
-    console.error('gasCall script error:', fn);
-    if (fail) fail(new Error('Error de red: ' + fn));
+    if (fail) fail(new Error('Error de red'));
   };
   document.head.appendChild(script);
 }
