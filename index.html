@@ -1533,7 +1533,7 @@ display: block;
 </style>
 <script>
 // ── Conexión al backend Google Apps Script ──
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbyAE_--4_BLwU3Tf85f4QuwLUrAzfO8dr4B1Mc0SS6mwxaJRuztNYDD1aRPHk0b3Uf_/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwe1-aYAbMCnuT7ytvCjHbYZPHgKw6jhYvNrD6ZUGsHs9aAx8VEyjS8SCp3ScfKFw3Q2g/exec';
 
 function gasCall(fn, args, ok, fail) {
   var payload = JSON.stringify({ action: fn, args: args || [] });
@@ -1779,7 +1779,7 @@ function fechaManana() {
 </div>
 <div class="card">
 <div class="card-header">
-<h3>📅 Pacientes de Hoy</h3>
+<h3>📅 Pacientes de Mañana</h3>
 <div class="table-actions">
 <button class="table-btn" onclick="filtrarCitasHoy('todos')">Todos</button>
 <button class="table-btn" onclick="filtrarCitasHoy('PROGRAMADA')">Programadas</button>
@@ -4641,7 +4641,7 @@ var html = '';
 for (var h = 9; h < 18; h++) {
 var hora = String(h).padStart(2, '0') + ':00';
 var horaFin = String(h + 1).padStart(2, '0') + ':00';
-var ocupado = ocupados.find(function(o) { return o.inicio === hora; });
+var ocupado = ocupados.find(function(o) { return o.hora === hora; });
 if (ocupado) {
 html += '<div class="hour-label">' + hora + '</div>' +
 '<div class="hour-slot occupied">' + ocupado.paciente + ' (' + ocupado.estatus + ')</div>';
@@ -4659,7 +4659,7 @@ var container = document.getElementById('agenda-container');
 var diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 var nombresDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 // Calcular lunes de la semana
-var fecha = new Date(fechaBase);
+var fecha = new Date(fechaBase + 'T12:00:00');
 var diaSemana = fecha.getDay();
 var diffLunes = diaSemana === 0 ? -6 : 1 - diaSemana;
 var lunes = new Date(fecha);
@@ -4701,7 +4701,7 @@ var ocupados = res.ocupados || [];
 var disponibles = res.disponibles || [];
 document.querySelectorAll('.week-slot[data-fecha="' + fecha + '"]').forEach(function(slot) {
 var hora = slot.dataset.hora;
-var ocupado = ocupados.find(function(o) { return o.inicio === hora; });
+var ocupado = ocupados.find(function(o) { return o.hora === hora; });
 slot.classList.remove('loading');
 if (ocupado) {
 slot.classList.add('occupied');
@@ -4720,7 +4720,7 @@ function(){});
 }
 function renderAgendaMes(fechaBase) {
 var container = document.getElementById('agenda-container');
-var fecha = new Date(fechaBase);
+var fecha = new Date(fechaBase + 'T12:00:00');
 var anio = fecha.getFullYear();
 var mes = fecha.getMonth();
 var primerDia = new Date(anio, mes, 1);
@@ -6096,7 +6096,7 @@ function formatHora(hora) {
 if (!hora) return '--:--';
 var parts = String(hora).split(':');
 if (parts.length >= 2) {
-return parts[0].padStart(2, '0') + ':' + parts[1].padStart(2, '0');
+return parts[0].padStart(2, '0') + ':00';
 }
 return hora;
 }
